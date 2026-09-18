@@ -1,4 +1,4 @@
-# Sistema Inteligente de Reconocimiento Facial
+# Proyecto: Sistema Inteligente de Reconocimiento Facial
 
 Frontend desarrollado paso a paso siguiendo la propuesta del documento técnico del proyecto de **Inteligencia Artificial, Machine Learning y Deep Learning**.
 
