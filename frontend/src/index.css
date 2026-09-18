@@ -1,0 +1,20 @@
+/* Importa Tailwind */
+@import "tailwindcss";
+
+/* Hace que los tamaños de los elementos sean más fáciles de controlar */
+* {
+  box-sizing: border-box;
+}
+
+/* Elimina el margen que el navegador agrega automáticamente */
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+/* Evita que la página se reduzca demasiado */
+body {
+  min-width: 320px;
+}
