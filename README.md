@@ -21,6 +21,12 @@ Esta primera etapa corresponde únicamente al **frontend**. El backend con FastA
 
 ## Ejecución del proyecto
 
+Abrir la carpeta frontend (Se recomienda usar una terminal de Git Bash):
+
+```bash
+cd frontend
+```
+
 Instalar dependencias:
 
 ```bash
