@@ -12,6 +12,7 @@ Esta primera etapa corresponde únicamente al **frontend**. El backend con FastA
 - Vite
 - TypeScript
 - Tailwind CSS
+- React Router DOM
 - Axios
 - React Webcam
 - Recharts
@@ -21,7 +22,7 @@ Esta primera etapa corresponde únicamente al **frontend**. El backend con FastA
 
 ## Ejecución del proyecto
 
-Abrir la carpeta frontend (Se recomienda usar una terminal de Git Bash):
+Abrir la carpeta `frontend`:
 
 ```bash
 cd frontend
@@ -79,7 +80,7 @@ Se instalaron las herramientas necesarias para el frontend.
 npm install tailwindcss @tailwindcss/vite
 ```
 
-Se configuró Tailwind mediante `vite.config.ts` y `index.css`.
+Se configuró Tailwind mediante `vite.config.ts` e `index.css`.
 
 ### Librerías adicionales
 
@@ -103,10 +104,16 @@ Se organizó el proyecto separando responsabilidades.
 ```text
 src/
 ├── components/
+│   ├── layout/
+│   │   ├── Sidebar.tsx
+│   │   └── Topbar.tsx
 │   ├── CameraCapture.tsx
 │   ├── FaceResultCard.tsx
 │   ├── SimilarityBar.tsx
 │   └── ProbabilityChart.tsx
+│
+├── config/
+│   └── navigation.ts
 │
 ├── pages/
 │   ├── Dashboard.tsx
@@ -127,57 +134,60 @@ src/
 └── main.tsx
 ```
 
-Responsabilidades:
+Responsabilidades principales:
 
 - `pages/`: pantallas completas.
 - `components/`: elementos reutilizables.
+- `components/layout/`: estructura general de navegación.
+- `config/`: configuración reutilizable de navegación y rutas.
 - `services/`: comunicación con el backend.
 - `types/`: interfaces y tipos de TypeScript.
 
 ---
 
-## Fase 4 - Layout y navegación
+## Fase 4 - Layout y navegación inicial
 
-Se creó la estructura general de la aplicación:
+Se creó la primera estructura general de la aplicación:
 
-- Encabezado principal.
+- Encabezado.
 - Sidebar.
 - Área de contenido.
 - Navegación entre páginas.
 
-Se utilizó `useState` para controlar la página activa sin recargar la aplicación.
+En esta fase se utilizó `useState` para controlar la página activa. Más adelante, durante la Fase 12, esta navegación fue reemplazada por **React Router DOM** para disponer de URLs reales, navegación Atrás/Adelante y recarga de cada ruta.
 
-Páginas disponibles:
+Páginas principales:
 
-- Dashboard
-- Registro facial
-- Reconocimiento
-- Probabilidades
-- Historial
+- Dashboard.
+- Registro facial.
+- Reconocimiento.
+- Probabilidades.
+- Historial.
 
 ---
 
-## Fase 5 - Dashboard
+## Fase 5 - Dashboard inicial
 
-Se desarrolló el Dashboard con datos simulados.
+Se desarrolló la primera versión del Dashboard con datos simulados.
 
-Incluye:
+Incluyó:
 
 - Personas registradas.
 - Cantidad de reconocimientos.
 - Coincidencias.
 - Tasa de coincidencia.
 - Tabla de reconocimientos recientes.
+- Diseño responsive para las tarjetas.
 
-También se implementó diseño responsive para las tarjetas.
+Esta pantalla fue rediseñada posteriormente en la Fase 12.
 
 ---
 
-## Fase 6 - Registro facial
+## Fase 6 - Registro facial inicial
 
 Se creó el formulario para registrar una persona.
 
-Incluye:
+Incluyó:
 
 - Nombre completo.
 - Correo electrónico.
@@ -192,17 +202,17 @@ Se utilizó:
 - `SubmitEvent`
 - `useRef`
 - `react-webcam`
-- Props entre componentes
+- Props entre componentes.
 
 Por ahora los datos se preparan en el frontend, pero todavía no se envían al backend.
 
 ---
 
-## Fase 7 - Reconocimiento facial
+## Fase 7 - Reconocimiento facial inicial
 
-Se creó la interfaz del módulo de reconocimiento.
+Se creó la primera interfaz del módulo de reconocimiento.
 
-Incluye:
+Incluyó:
 
 - Reutilización de `CameraCapture`.
 - Captura de fotografía.
@@ -215,7 +225,7 @@ Incluye:
 - Coincidencia.
 - Probabilidad calibrada.
 
-También se desarrollaron los componentes:
+También se desarrollaron:
 
 - `FaceResultCard.tsx`
 - `SimilarityBar.tsx`
@@ -224,11 +234,11 @@ El reconocimiento todavía utiliza datos simulados.
 
 ---
 
-## Fase 8 - Probabilidades
+## Fase 8 - Probabilidades inicial
 
 Se desarrolló la página de análisis de resultados.
 
-Incluye:
+Incluyó:
 
 - Similitud.
 - Distancia.
@@ -248,17 +258,17 @@ El gráfico también fue adaptado para dispositivos pequeños mediante scroll ho
 
 ---
 
-## Fase 9 - Historial
+## Fase 9 - Historial inicial
 
 Se creó una tabla dinámica de reconocimientos.
 
-Se aprendió a trabajar con:
+Se trabajó con:
 
 - Arreglos.
 - `.map()`
 - `.filter()`
 - `key`
-- Filtros mediante `useState`
+- Filtros mediante `useState`.
 
 Filtros disponibles:
 
@@ -314,9 +324,9 @@ Todavía no se ejecutan estas peticiones porque el backend aún no ha sido const
 
 ---
 
-## Fase 11 - Responsive y revisión final
+## Fase 11 - Responsive y primera revisión
 
-Se realizó una revisión general del frontend para mejorar su funcionamiento en diferentes tamaños de pantalla.
+Se realizó una primera revisión general del frontend para mejorar su funcionamiento en diferentes tamaños de pantalla.
 
 Cambios principales:
 
@@ -333,6 +343,223 @@ Cambios principales:
 
 ---
 
+# Fase 12 - Mejora visual profesional y refactor final
+
+Después de terminar la primera versión funcional se realizó una segunda etapa de diseño y organización para darle al frontend una apariencia más profesional y una estructura más mantenible.
+
+## Fase 12.1 - Identidad visual
+
+Se creó una identidad visual global utilizando Tailwind CSS.
+
+Se definieron:
+
+- Paleta verde principal.
+- Colores para fondo, bordes y textos secundarios.
+- Tipografía **DM Sans** para el contenido general.
+- Tipografía **Manrope** para títulos y números destacados.
+- Variables personalizadas mediante `@theme`.
+- Estilos globales de foco y accesibilidad.
+
+Colores principales:
+
+```text
+brand          #087f70
+brand-dark     #102e2c
+brand-light    #d9edbd
+ink            #203533
+muted          #768480
+surface        #f5f7f8
+line           #e7eceb
+```
+
+También se creó una escala `brand-50` a `brand-950` para evitar colores hardcodeados dentro de los componentes.
+
+---
+
+## Fase 12.2 - Layout profesional y React Router
+
+Se reorganizó la estructura general del sistema.
+
+Se instaló React Router DOM:
+
+```bash
+npm install react-router-dom
+```
+
+Se implementó:
+
+- `BrowserRouter` en `main.tsx`.
+- `Routes` y `Route` en `App.tsx`.
+- `NavLink` para el sidebar.
+- `useLocation()` para identificar la ruta actual.
+- `useNavigate()` para navegar desde botones.
+
+Rutas principales:
+
+```text
+/                  Dashboard
+/registro          Registro facial
+/reconocimiento    Reconocimiento
+/probabilidades    Probabilidades
+/historial         Historial
+```
+
+Con esta mejora:
+
+- El botón Atrás/Adelante del navegador funciona.
+- Cada página tiene una URL real.
+- Al recargar se mantiene la página actual.
+- Las rutas pueden compartirse directamente.
+
+También se:
+
+- Extrajo `Sidebar.tsx`.
+- Extrajo `Topbar.tsx`.
+- Creó `config/navigation.ts`.
+- Derivó el tipo de página a partir de la configuración de navegación.
+- Añadió `aria-label` a la navegación.
+- Eliminó el punto verde redundante del botón activo, manteniendo el fondo y texto verde como indicador.
+
+---
+
+## Fase 12.3 - Rediseño del Dashboard
+
+Se reconstruyó visualmente el Dashboard.
+
+Incluye:
+
+- Hero principal en verde oscuro.
+- Botón **Iniciar reconocimiento**.
+- Decoración relacionada con reconocimiento facial.
+- Cuatro tarjetas de estadísticas generadas con `.map()`.
+- Actividad reciente.
+- Acceso al historial.
+- Tarjeta de siguiente paso para registrar una persona.
+- Nota de privacidad.
+- Sección para entender una coincidencia.
+- Reutilización de `ProbabilityChart`.
+
+Se mantuvieron datos simulados hasta conectar el backend.
+
+---
+
+## Fase 12.4 - Rediseño de Registro Facial
+
+Se reorganizó la página en dos pasos:
+
+```text
+01 Información personal
+02 Imagen facial
+```
+
+Mejoras:
+
+- Formulario más claro y organizado.
+- Estado visual de la imagen facial.
+- Panel informativo sobre biometría.
+- Recomendaciones de captura.
+- Reutilización de `CameraCapture`.
+- Posibilidad de usar webcam.
+- Posibilidad de seleccionar una imagen del dispositivo.
+
+Para la carga de imágenes se utilizó `FileReader` y el archivo se convierte a Data URL, manteniendo el mismo formato que una captura de webcam.
+
+---
+
+## Fase 12.5 - Rediseño de Reconocimiento
+
+Se reorganizó el flujo visual:
+
+```text
+Captura facial
+      ↓
+Analizar rostro
+      ↓
+Resultado
+```
+
+Mejoras principales:
+
+- Panel independiente de captura.
+- Panel independiente de resultado.
+- Estado vacío mientras no existe análisis.
+- Aviso visible de modo demostración.
+- `FaceResultCard` rediseñado.
+- Identidad candidata.
+- Barra de similitud.
+- Métricas de distancia, umbral y probabilidad.
+- Interpretación del resultado.
+
+También se mejoró `SimilarityBar` para limitar visualmente los porcentajes entre 0 y 100.
+
+---
+
+## Fase 12.6 - Rediseño de Probabilidades
+
+Se reorganizó la página para explicar mejor las métricas.
+
+Incluye:
+
+- Similitud.
+- Distancia.
+- Umbral.
+- Probabilidad calibrada.
+- Tarjetas de métricas.
+- Barra de similitud.
+- Decisión simulada.
+- Gráfico con Recharts.
+- Explicación conceptual de similitud, umbral y probabilidad.
+
+`ProbabilityChart` fue convertido en un componente reutilizable que se encarga únicamente del gráfico, dejando los contenedores y títulos a cada página.
+
+La distancia no se representa como porcentaje porque no tiene la misma interpretación que similitud, umbral o probabilidad.
+
+---
+
+## Fase 12.7 - Rediseño de Historial
+
+Se mejoró la tabla del historial.
+
+Se añadieron:
+
+- Buscador por persona.
+- Filtros de resultado.
+- Contador dinámico de registros.
+- Avatares con iniciales.
+- Badges de coincidencia.
+- Estado sin resultados.
+- Scroll horizontal responsive.
+- Filtros combinados entre búsqueda y resultado.
+
+También se corrigió el movimiento visual de la tabla utilizando:
+
+- `table-fixed`.
+- `colgroup` con anchos definidos.
+- `scrollbar-gutter: stable` para evitar movimientos cuando la barra vertical aparece o desaparece.
+
+---
+
+## Fase 12.8 - Revisión visual y responsive final
+
+Se realizó una última revisión de coherencia de toda la interfaz.
+
+Cambios finales:
+
+- El Topbar quedó como único encabezado de la página actual.
+- Se eliminaron títulos repetidos como `NEXO / ...` dentro de cada página.
+- El nombre de la página se mantiene en sidebar, URL y Topbar.
+- El contenido comienza directamente con información útil.
+- Sidebar responsive con iconos en pantallas pequeñas.
+- Topbar fijo mediante `sticky`.
+- Footer simplificado.
+- Corrección de desplazamientos visuales en Historial.
+- Eliminación del indicador circular redundante del sidebar.
+- Revisión de colores, espaciados, tablas y gráficos.
+- Verificación de navegación mediante React Router.
+- Revisión final en PC y dispositivos móviles.
+
+---
+
 # Componentes principales
 
 ## `CameraCapture.tsx`
@@ -343,18 +570,21 @@ Permite:
 - Tomar una fotografía.
 - Mostrar una vista previa.
 - Repetir la captura.
+- Seleccionar una imagen del dispositivo.
+- Convertir imágenes a Data URL.
 - Enviar la imagen al componente padre.
 
 ## `FaceResultCard.tsx`
 
-Muestra el resultado de reconocimiento:
+Muestra:
 
 - Persona candidata.
+- Resultado de coincidencia.
 - Similitud.
 - Distancia.
 - Umbral.
 - Probabilidad calibrada.
-- Coincidencia o no coincidencia.
+- Interpretación del análisis.
 
 ## `SimilarityBar.tsx`
 
@@ -362,6 +592,7 @@ Representa visualmente:
 
 - Similitud facial.
 - Umbral configurado.
+- Escala de comparación.
 
 ## `ProbabilityChart.tsx`
 
@@ -371,6 +602,26 @@ Utiliza Recharts para mostrar:
 - Umbral.
 - Probabilidad calibrada.
 
+El componente se mantiene desacoplado del diseño exterior para poder reutilizarse en diferentes páginas.
+
+## `Sidebar.tsx`
+
+Gestiona:
+
+- Navegación principal.
+- Estado visual de la ruta activa.
+- Diseño responsive.
+- Marca visual del sistema.
+- Información del proyecto.
+
+## `Topbar.tsx`
+
+Muestra:
+
+- Página actual.
+- Descripción breve.
+- Estado de modo demostración.
+
 ---
 
 # Estado actual del proyecto
@@ -379,18 +630,27 @@ Frontend completado:
 
 - [x] React + Vite + TypeScript
 - [x] Tailwind CSS
-- [x] Navegación
+- [x] Identidad visual personalizada
+- [x] React Router DOM
+- [x] Rutas reales
+- [x] Sidebar responsive
+- [x] Topbar
 - [x] Dashboard
 - [x] Registro facial
-- [x] Cámara
+- [x] Captura mediante cámara
+- [x] Carga de imágenes
 - [x] Reconocimiento visual
 - [x] Resultados simulados
 - [x] Probabilidades
 - [x] Gráficos
 - [x] Historial
+- [x] Buscador
 - [x] Filtros
 - [x] Axios preparado
 - [x] Diseño responsive
+- [x] Revisión visual final
+- [x] Navegación accesible
+- [x] Compilación preparada para producción
 
 Pendiente:
 

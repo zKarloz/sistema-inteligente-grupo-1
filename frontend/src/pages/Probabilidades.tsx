@@ -1,209 +1,297 @@
+import { useNavigate } from "react-router-dom";
 import {
+    ArrowRight,
     BrainCircuit,
     Gauge,
-    Percent,
+    Info,
+    Ruler,
     ScanFace,
+    Target,
 } from "lucide-react";
 
 import ProbabilityChart from "../components/ProbabilityChart";
 import SimilarityBar from "../components/SimilarityBar";
 
 function Probabilidades() {
-    // Datos simulados hasta conectar el backend y el modelo de Machine Learning
+    // Permite navegar hacia el módulo de reconocimiento
+    const navigate = useNavigate();
+
+    // Datos simulados hasta conectar el backend
     const similitud = 0.87;
     const distancia = 0.26;
     const umbral = 0.75;
     const probabilidadCalibrada = 0.93;
 
-    // Determina si la similitud supera el umbral configurado
+    // Determina si la similitud supera el umbral
     const coincide = similitud >= umbral;
 
+    // Métricas que se mostrarán en las tarjetas
+    const metricas = [
+        {
+            titulo: "Similitud",
+            valor: similitud.toFixed(2),
+            descripcion: "Comparación entre rostros",
+            icono: Gauge,
+        },
+        {
+            titulo: "Distancia",
+            valor: distancia.toFixed(2),
+            descripcion: "Separación entre embeddings",
+            icono: Ruler,
+        },
+        {
+            titulo: "Umbral",
+            valor: umbral.toFixed(2),
+            descripcion: "Límite de aceptación",
+            icono: Target,
+        },
+        {
+            titulo: "Probabilidad",
+            valor: `${(
+                probabilidadCalibrada * 100
+            ).toFixed(1)}%`,
+            descripcion: "Confianza calibrada",
+            icono: BrainCircuit,
+        },
+    ];
+
     return (
-        <section>
-            {/* Encabezado de la página */}
-            <div>
-                <h2 className="text-3xl font-bold text-gray-800">
-                    Probabilidades
-                </h2>
+        <div className="mx-auto w-full max-w-[1500px]">
 
-                <p className="mt-2 text-gray-500">
-                    Análisis de similitud, umbral y probabilidad calibrada.
-                </p>
-            </div>
-
-            {/* Aviso sobre los datos actuales */}
-            <div className="mt-6 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-700">
-                Los valores mostrados actualmente son simulados. La probabilidad
-                calibrada será calculada posteriormente por el modelo de Machine
-                Learning.
-            </div>
-
-            {/* Tarjetas principales */}
-            <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-                {/* Similitud */}
-                <div className="rounded-xl border border-gray-200 bg-white p-5">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-gray-500">
-                                Similitud
-                            </p>
-
-                            <p className="mt-2 text-2xl font-bold text-gray-800">
-                                {similitud.toFixed(2)}
-                            </p>
-                        </div>
-
-                        <ScanFace
-                            size={30}
-                            className="text-blue-600"
-                        />
-                    </div>
-                </div>
-
-                {/* Distancia */}
-                <div className="rounded-xl border border-gray-200 bg-white p-5">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-gray-500">
-                                Distancia
-                            </p>
-
-                            <p className="mt-2 text-2xl font-bold text-gray-800">
-                                {distancia.toFixed(2)}
-                            </p>
-                        </div>
-
-                        <Gauge
-                            size={30}
-                            className="text-violet-600"
-                        />
-                    </div>
-                </div>
-
-                {/* Umbral */}
-                <div className="rounded-xl border border-gray-200 bg-white p-5">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-gray-500">
-                                Umbral
-                            </p>
-
-                            <p className="mt-2 text-2xl font-bold text-gray-800">
-                                {umbral.toFixed(2)}
-                            </p>
-                        </div>
-
-                        <BrainCircuit
-                            size={30}
-                            className="text-orange-500"
-                        />
-                    </div>
-                </div>
-
-                {/* Probabilidad calibrada */}
-                <div className="rounded-xl border border-gray-200 bg-white p-5">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-gray-500">
-                                Probabilidad calibrada
-                            </p>
-
-                            <p className="mt-2 text-2xl font-bold text-gray-800">
-                                {(probabilidadCalibrada * 100).toFixed(1)}%
-                            </p>
-                        </div>
-
-                        <Percent
-                            size={30}
-                            className="text-green-600"
-                        />
-                    </div>
-                </div>
-            </div>
-
-            {/* Contenido de análisis */}
-            <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
-                {/* Análisis de similitud */}
-                <div className="rounded-xl border border-gray-200 bg-white p-6">
-                    <h3 className="text-xl font-semibold text-gray-800">
-                        Análisis de similitud
-                    </h3>
-
-                    <p className="mt-1 text-sm text-gray-500">
-                        Comparación entre la similitud obtenida y el umbral.
-                    </p>
-
-                    <SimilarityBar
-                        similitud={similitud}
-                        umbral={umbral}
+            {/* Aviso de datos simulados */}
+            <section className="mb-5 flex flex-col gap-4 rounded-xl border border-brand-100 bg-brand-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex gap-3">
+                    <Info
+                        size={20}
+                        className="mt-0.5 shrink-0 text-brand"
                     />
 
-                    {/* Resultado del umbral */}
-                    <div
-                        className={`mt-6 rounded-lg p-4 ${coincide
-                            ? "bg-green-50 text-green-700"
-                            : "bg-red-50 text-red-700"
-                            }`}
-                    >
-                        {coincide
-                            ? "La similitud supera el umbral establecido."
-                            : "La similitud no supera el umbral establecido."}
+                    <div>
+                        <p className="text-sm font-semibold text-ink">
+                            Análisis demostrativo
+                        </p>
+
+                        <p className="mt-1 text-xs leading-5 text-muted">
+                            Los valores mostrados todavía son simulados.
+                            Posteriormente serán calculados por FastAPI,
+                            el modelo facial y Machine Learning.
+                        </p>
                     </div>
                 </div>
 
-                {/* Explicación de conceptos */}
-                <div className="rounded-xl border border-gray-200 bg-white p-6">
-                    <h3 className="text-xl font-semibold text-gray-800">
-                        Interpretación
+                <button
+                    type="button"
+                    onClick={() => navigate("/reconocimiento")}
+                    className="flex shrink-0 items-center gap-2 self-start rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 sm:self-auto"
+                >
+                    <ScanFace size={17} />
+
+                    Ir a reconocimiento
+
+                    <ArrowRight size={16} />
+                </button>
+            </section>
+
+            {/* Tarjetas principales */}
+            <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                {metricas.map((metrica) => {
+                    const Icono = metrica.icono;
+
+                    return (
+                        <article
+                            key={metrica.titulo}
+                            className="rounded-xl border border-line bg-white p-5"
+                        >
+                            {/* Nombre e icono */}
+                            <div className="flex items-center justify-between gap-3">
+                                <span className="text-sm text-muted">
+                                    {metrica.titulo}
+                                </span>
+
+                                <Icono
+                                    size={19}
+                                    className="text-brand"
+                                />
+                            </div>
+
+                            {/* Valor */}
+                            <strong className="mt-4 block font-display text-3xl font-semibold text-ink">
+                                {metrica.valor}
+                            </strong>
+
+                            {/* Descripción */}
+                            <span className="mt-2 block text-xs text-muted">
+                                {metrica.descripcion}
+                            </span>
+                        </article>
+                    );
+                })}
+            </section>
+
+            {/* Similitud e interpretación */}
+            <section className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
+                {/* Barra de similitud */}
+                <article className="rounded-xl border border-line bg-white p-5 sm:p-6">
+                    <span className="text-xs font-semibold tracking-wider text-muted">
+                        ANÁLISIS DE SIMILITUD
+                    </span>
+
+                    <h2 className="mt-2 font-display text-lg font-semibold text-ink">
+                        Comparación facial
+                    </h2>
+
+                    <p className="mt-2 text-sm leading-6 text-muted">
+                        La similitud obtenida se compara con el
+                        umbral configurado para decidir si existe
+                        una coincidencia.
+                    </p>
+
+                    {/* Barra visual */}
+                    <div className="mt-7">
+                        <SimilarityBar
+                            similitud={similitud}
+                            umbral={umbral}
+                        />
+                    </div>
+                </article>
+
+                {/* Resultado de la decisión */}
+                <article
+                    className={`flex flex-col rounded-xl border p-5 sm:p-6 ${coincide
+                        ? "border-brand-100 bg-brand-50"
+                        : "border-red-100 bg-red-50"
+                        }`}
+                >
+                    <span className="text-xs font-semibold tracking-wider text-muted">
+                        DECISIÓN DEL SISTEMA
+                    </span>
+
+                    <div className="mt-5">
+                        <div
+                            className={`flex h-12 w-12 items-center justify-center rounded-full ${coincide
+                                ? "bg-brand-100 text-brand"
+                                : "bg-red-100 text-red-700"
+                                }`}
+                        >
+                            <ScanFace size={23} />
+                        </div>
+
+                        <h2 className="mt-4 font-display text-xl font-semibold text-ink">
+                            {coincide
+                                ? "Coincidencia aceptada"
+                                : "Coincidencia rechazada"}
+                        </h2>
+
+                        <p className="mt-3 text-sm leading-6 text-muted">
+                            {coincide
+                                ? `La similitud de ${similitud.toFixed(
+                                    2,
+                                )} supera el umbral de ${umbral.toFixed(
+                                    2,
+                                )}.`
+                                : `La similitud de ${similitud.toFixed(
+                                    2,
+                                )} no alcanza el umbral de ${umbral.toFixed(
+                                    2,
+                                )}.`}
+                        </p>
+                    </div>
+
+                    {/* Regla utilizada */}
+                    <div className="mt-auto pt-6">
+                        <div className="border-t border-brand-200 pt-5">
+                            <p className="text-xs leading-5 text-muted">
+                                Regla actual:
+                                <strong className="ml-1 font-semibold text-ink">
+                                    similitud ≥ umbral
+                                </strong>
+                            </p>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            {/* Gráfico principal */}
+            <section className="mt-5 overflow-hidden rounded-xl border border-line bg-white">
+                {/* Encabezado */}
+                <div className="border-b border-line px-5 py-5 sm:px-6">
+                    <span className="text-xs font-semibold tracking-wider text-muted">
+                        VISUALIZACIÓN
+                    </span>
+
+                    <h2 className="mt-2 font-display text-lg font-semibold text-ink">
+                        Comparación de indicadores
+                    </h2>
+
+                    <p className="mt-2 text-sm leading-6 text-muted">
+                        Los valores se muestran en una escala porcentual
+                        para facilitar su comparación visual.
+                    </p>
+                </div>
+
+                {/* Gráfico */}
+                <div className="p-5 sm:p-6">
+                    <ProbabilityChart
+                        similitud={similitud}
+                        umbral={umbral}
+                        probabilidad={
+                            probabilidadCalibrada
+                        }
+                    />
+                </div>
+            </section>
+
+            {/* Explicación conceptual */}
+            <section className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-3">
+                {/* Similitud */}
+                <article className="rounded-xl border border-line bg-white p-5">
+                    <span className="text-xs font-semibold tracking-wider text-brand">
+                        01 · SIMILITUD
+                    </span>
+
+                    <h3 className="mt-3 font-display text-base font-semibold text-ink">
+                        ¿Qué tan parecidos son?
                     </h3>
 
-                    <div className="mt-5 space-y-5">
-                        {/* Similitud */}
-                        <div>
-                            <p className="font-medium text-gray-800">
-                                Similitud
-                            </p>
+                    <p className="mt-2 text-sm leading-6 text-muted">
+                        Representa la cercanía entre las características
+                        faciales de dos imágenes.
+                    </p>
+                </article>
 
-                            <p className="mt-1 text-sm text-gray-500">
-                                Indica qué tan parecidos son los embeddings faciales.
-                            </p>
-                        </div>
+                {/* Umbral */}
+                <article className="rounded-xl border border-line bg-white p-5">
+                    <span className="text-xs font-semibold tracking-wider text-brand">
+                        02 · UMBRAL
+                    </span>
 
-                        {/* Umbral */}
-                        <div>
-                            <p className="font-medium text-gray-800">
-                                Umbral
-                            </p>
+                    <h3 className="mt-3 font-display text-base font-semibold text-ink">
+                        ¿Cuándo aceptamos?
+                    </h3>
 
-                            <p className="mt-1 text-sm text-gray-500">
-                                Valor utilizado para aceptar o rechazar una coincidencia.
-                            </p>
-                        </div>
+                    <p className="mt-2 text-sm leading-6 text-muted">
+                        Es el valor mínimo que debe alcanzar la similitud
+                        para considerar que existe una coincidencia.
+                    </p>
+                </article>
 
-                        {/* Probabilidad calibrada */}
-                        <div>
-                            <p className="font-medium text-gray-800">
-                                Probabilidad calibrada
-                            </p>
+                {/* Probabilidad */}
+                <article className="rounded-xl border border-line bg-white p-5">
+                    <span className="text-xs font-semibold tracking-wider text-brand">
+                        03 · PROBABILIDAD
+                    </span>
 
-                            <p className="mt-1 text-sm text-gray-500">
-                                Estimación estadística obtenida posteriormente mediante
-                                un modelo calibrado.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                    <h3 className="mt-3 font-display text-base font-semibold text-ink">
+                        ¿Qué tan confiable es?
+                    </h3>
 
-            {/* Gráfico */}
-            <div className="mt-6">
-                <ProbabilityChart
-                    similitud={similitud}
-                    umbral={umbral}
-                    probabilidad={probabilidadCalibrada}
-                />
-            </div>
-        </section>
+                    <p className="mt-2 text-sm leading-6 text-muted">
+                        Es un valor calibrado que posteriormente será
+                        estimado por el módulo de Machine Learning.
+                    </p>
+                </article>
+            </section>
+        </div>
     );
 }
 

@@ -1,12 +1,55 @@
-/* Importa Tailwind */
+/* Importamos las tipografías utilizadas por la identidad visual */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap");
+
+/* Importamos Tailwind CSS v4 */
 @import "tailwindcss";
 
-/* Hace que los tamaños de los elementos sean más fáciles de controlar */
+/*
+    Creamos colores y tipografías personalizados para Tailwind.
+
+    Esto nos permitirá utilizar clases como:
+    bg-brand
+    text-ink
+    bg-surface
+    border-line
+    font-display
+*/
+@theme {
+  /* Paleta principal */
+  --color-brand-50: #eff8f4;
+  --color-brand-100: #e1f2eb;
+  --color-brand-200: #c4e5d9;
+  --color-brand-300: #9bd1bd;
+  --color-brand-400: #67b59c;
+  --color-brand-500: #359984;
+  --color-brand-600: #087f70;
+  --color-brand-700: #08675d;
+  --color-brand-800: #0c514a;
+  --color-brand-900: #103f3b;
+  --color-brand-950: #102e2c;
+
+  /* Alias principal */
+  --color-brand: #087f70;
+  --color-brand-dark: #102e2c;
+  --color-brand-light: #d9edbd;
+
+  /* Colores generales */
+  --color-ink: #203533;
+  --color-muted: #768480;
+  --color-surface: #f5f7f8;
+  --color-line: #e7eceb;
+
+  /* Tipografías */
+  --font-sans: "DM Sans", sans-serif;
+  --font-display: "Manrope", sans-serif;
+}
+
+/* Hace más sencillo controlar tamaños y espaciados */
 * {
   box-sizing: border-box;
 }
 
-/* Elimina el margen que el navegador agrega automáticamente */
+/* Configuración general de la página */
 html,
 body,
 #root {
@@ -14,7 +57,34 @@ body,
   min-height: 100%;
 }
 
-/* Evita que la página se reduzca demasiado */
+/* Evita que el contenido se mueva cuando la scrollbar aparece o desaparece */
+html {
+  scrollbar-gutter: stable;
+}
+
+/* Estilo global del sitio */
 body {
   min-width: 320px;
+  background: #f5f7f8;
+  color: #203533;
+  font-family: "DM Sans", sans-serif;
+}
+
+/* Los botones e inputs utilizan la misma tipografía del sistema */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+/* Mejora la interacción de los botones */
+button {
+  cursor: pointer;
+}
+
+/* Estilo visible cuando navegamos utilizando teclado */
+:focus-visible {
+  outline: 3px solid #43bba2;
+  outline-offset: 3px;
 }

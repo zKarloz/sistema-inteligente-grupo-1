@@ -1,52 +1,89 @@
-// Datos que el componente recibirá desde otro componente
+// Datos necesarios para representar la similitud
 interface SimilarityBarProps {
     similitud: number;
     umbral: number;
 }
 
-function SimilarityBar({ similitud, umbral }: SimilarityBarProps) {
-    // Convertimos los valores decimales a porcentaje solo para mostrarlos visualmente
-    const similitudPorcentaje = similitud * 100;
-    const umbralPorcentaje = umbral * 100;
+function SimilarityBar({
+    similitud,
+    umbral,
+}: SimilarityBarProps) {
+    // Convierte valores decimales a porcentajes visuales
+    const similitudPorcentaje =
+        Math.min(Math.max(similitud * 100, 0), 100);
+
+    const umbralPorcentaje =
+        Math.min(Math.max(umbral * 100, 0), 100);
 
     return (
-        <div className="mt-5">
-            {/* Título y valor de similitud */}
-            <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-gray-700">
-                    Similitud facial
-                </p>
+        <div>
+            {/* Valores principales */}
+            <div className="mb-3 flex items-center justify-between gap-4 text-sm">
+                <div>
+                    <span className="text-muted">
+                        Similitud
+                    </span>
 
-                <p className="text-sm font-semibold text-gray-800">
-                    {similitud.toFixed(2)}
-                </p>
+                    <strong className="ml-2 font-semibold text-ink">
+                        {similitud.toFixed(2)}
+                    </strong>
+                </div>
+
+                <div>
+                    <span className="text-muted">
+                        Umbral
+                    </span>
+
+                    <strong className="ml-2 font-semibold text-ink">
+                        {umbral.toFixed(2)}
+                    </strong>
+                </div>
             </div>
 
-            {/* Barra visual de similitud */}
-            <div className="relative mt-2 h-4 overflow-hidden rounded-full bg-gray-200">
+            {/* Barra principal */}
+            <div className="relative h-4 overflow-visible rounded-full bg-brand-50">
+                {/* Nivel de similitud */}
                 <div
-                    className="h-full rounded-full bg-blue-600"
+                    className="h-full rounded-full bg-brand transition-all"
                     style={{
                         width: `${similitudPorcentaje}%`,
                     }}
                 />
 
-                {/* Indicador visual del umbral */}
+                {/* Marca del umbral */}
                 <div
-                    className="absolute top-0 h-full w-0.5 bg-red-500"
+                    className="absolute top-1/2 h-7 w-0.5 -translate-y-1/2 bg-amber-500"
                     style={{
                         left: `${umbralPorcentaje}%`,
                     }}
+                    title={`Umbral: ${umbral.toFixed(2)}`}
                 />
             </div>
 
-            {/* Información del umbral */}
-            <div className="mt-2 flex justify-between text-xs text-gray-500">
+            {/* Escala */}
+            <div className="mt-3 flex justify-between text-xs text-muted">
                 <span>0.00</span>
+
                 <span>
-                    Umbral: {umbral.toFixed(2)}
+                    Mayor similitud
                 </span>
+
                 <span>1.00</span>
+            </div>
+
+            {/* Leyenda */}
+            <div className="mt-4 flex flex-wrap gap-4 text-xs text-muted">
+                <span className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-brand" />
+
+                    Similitud obtenida
+                </span>
+
+                <span className="flex items-center gap-2">
+                    <span className="h-3 w-0.5 bg-amber-500" />
+
+                    Umbral de aceptación
+                </span>
             </div>
         </div>
     );

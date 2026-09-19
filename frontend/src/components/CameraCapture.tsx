@@ -1,99 +1,175 @@
-import { useRef, useState } from "react";
+import {
+    useRef,
+    useState,
+    type ChangeEvent,
+} from "react";
 import Webcam from "react-webcam";
-import { Camera, RotateCcw } from "lucide-react";
+import {
+    Camera,
+    CheckCircle2,
+    ImagePlus,
+    RotateCcw,
+    ScanFace,
+} from "lucide-react";
 
-// Datos que el componente padre puede enviar a CameraCapture
+// Datos que el componente envía hacia la página padre
 interface CameraCaptureProps {
     onCapture: (imagen: string | null) => void;
 }
 
-function CameraCapture({ onCapture }: CameraCaptureProps) {
+function CameraCapture({
+    onCapture,
+}: CameraCaptureProps) {
     // Referencia directa al componente Webcam
     const webcamRef = useRef<Webcam>(null);
 
-    // Guarda temporalmente la fotografía tomada
-    const [imagenCapturada, setImagenCapturada] = useState<string | null>(null);
+    // Imagen capturada o seleccionada
+    const [imagenCapturada, setImagenCapturada] =
+        useState<string | null>(null);
 
     // Captura una fotografía utilizando la cámara
     function capturarImagen() {
-        const imagen = webcamRef.current?.getScreenshot();
+        const imagen =
+            webcamRef.current?.getScreenshot();
 
         if (imagen) {
             setImagenCapturada(imagen);
-
-            // Envía la fotografía al componente RegistroFacial
             onCapture(imagen);
         }
     }
 
-    // Elimina la fotografía para permitir una nueva captura
+    // Permite eliminar la captura y volver a usar la cámara
     function repetirCaptura() {
         setImagenCapturada(null);
         onCapture(null);
     }
 
+    // Convierte una imagen seleccionada en una Data URL
+    function seleccionarImagen(
+        evento: ChangeEvent<HTMLInputElement>,
+    ) {
+        const archivo = evento.target.files?.[0];
+
+        if (!archivo) {
+            return;
+        }
+
+        const lector = new FileReader();
+
+        lector.onload = () => {
+            const imagen = lector.result;
+
+            if (typeof imagen === "string") {
+                setImagenCapturada(imagen);
+                onCapture(imagen);
+            }
+        };
+
+        lector.readAsDataURL(archivo);
+    }
+
     return (
-        <div className="rounded-xl border border-gray-200 bg-white p-6">
-            {/* Encabezado */}
-            <div className="flex items-center gap-3">
-                <Camera className="text-blue-600" />
-
-                <h3 className="text-xl font-semibold text-gray-800">
-                    Captura facial
-                </h3>
-            </div>
-
-            <p className="mt-2 text-sm text-gray-500">
-                Coloca tu rostro frente a la cámara y captura una fotografía.
-            </p>
-
-            {/* Área de cámara o fotografía capturada */}
-            {/* ¿NO existe imagenCapturada? */}
-            {/* SI --> Mostrar cámara */}
-            {/* NO --> Mostrar fotografía */}
-            <div className="mt-6 overflow-hidden rounded-xl bg-gray-900">
+        <div>
+            {/* Área principal de cámara o fotografía */}
+            <div className="relative flex min-h-[320px] items-center justify-center overflow-hidden rounded-xl bg-brand-950">
                 {!imagenCapturada ? (
-                    <Webcam
-                        ref={webcamRef}
-                        audio={false}
-                        screenshotFormat="image/jpeg"
-                        videoConstraints={{
-                            facingMode: "user",
-                        }}
-                        className="w-full"
-                    />
+                    <>
+                        {/* Cámara */}
+                        <Webcam
+                            ref={webcamRef}
+                            audio={false}
+                            screenshotFormat="image/jpeg"
+                            videoConstraints={{
+                                facingMode: "user",
+                            }}
+                            className="h-full min-h-[320px] w-full object-cover"
+                        />
+
+                        {/* Guía visual para centrar el rostro */}
+                        <div
+                            className="pointer-events-none absolute inset-0 flex items-center justify-center"
+                            aria-hidden="true"
+                        >
+                            <div className="flex h-48 w-40 items-center justify-center rounded-[40%] border border-brand-300/60">
+                                <ScanFace
+                                    size={58}
+                                    strokeWidth={1}
+                                    className="text-brand-200/40"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Estado de la cámara */}
+                        <div className="absolute left-3 top-3 flex items-center gap-2 rounded-md bg-brand-950/80 px-3 py-2 text-xs text-brand-100">
+                            <span className="h-1.5 w-1.5 rounded-full bg-brand-400" />
+
+                            Cámara activa
+                        </div>
+                    </>
                 ) : (
-                    <img
-                        src={imagenCapturada}
-                        alt="Rostro capturado"
-                        className="w-full"
-                    />
+                    <>
+                        {/* Fotografía capturada */}
+                        <img
+                            src={imagenCapturada}
+                            alt="Rostro preparado para el registro"
+                            className="h-full min-h-[320px] w-full object-contain"
+                        />
+
+                        {/* Confirmación */}
+                        <div className="absolute left-3 top-3 flex items-center gap-2 rounded-md bg-brand-950/80 px-3 py-2 text-xs text-brand-100">
+                            <CheckCircle2 size={14} />
+
+                            Imagen preparada
+                        </div>
+                    </>
                 )}
             </div>
 
-            {/* Botones de la cámara */}
-            {/* ¿NO existe imagenCapturada? */}
-            {/* SI --> Mostrar botón [ Capturar fotografía ] */}
-            {/* NO --> Mostrar botón [ Repetir fotografía ] */}
-            {!imagenCapturada ? (
-                <button
-                    type="button"
-                    onClick={capturarImagen}
-                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 font-medium text-white hover:bg-blue-700"
-                >
-                    <Camera size={20} />
-                    Capturar fotografía
-                </button>
-            ) : (
-                <button
-                    type="button"
-                    onClick={repetirCaptura}
-                    className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 px-4 py-3 font-medium text-gray-700 hover:bg-gray-100"
-                >
-                    <RotateCcw size={20} />
-                    Repetir fotografía
-                </button>
-            )}
+            {/* Acciones disponibles */}
+            <div className="mt-4 flex flex-wrap justify-center gap-3">
+                {!imagenCapturada ? (
+                    <>
+                        {/* Capturar desde webcam */}
+                        <button
+                            type="button"
+                            onClick={capturarImagen}
+                            className="flex items-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
+                        >
+                            <Camera size={17} />
+
+                            Capturar rostro
+                        </button>
+
+                        {/* Seleccionar una imagen del dispositivo */}
+                        <label className="relative flex cursor-pointer items-center gap-2 rounded-lg border border-line bg-white px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-surface">
+                            <ImagePlus
+                                size={17}
+                                className="text-brand"
+                            />
+
+                            Subir imagen
+
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={seleccionarImagen}
+                                className="absolute inset-0 cursor-pointer opacity-0"
+                            />
+                        </label>
+                    </>
+                ) : (
+                    /* Volver a realizar la captura */
+                    <button
+                        type="button"
+                        onClick={repetirCaptura}
+                        className="flex items-center gap-2 rounded-lg border border-line bg-white px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-surface"
+                    >
+                        <RotateCcw size={17} />
+
+                        Repetir captura
+                    </button>
+                )}
+            </div>
         </div>
     );
 }

@@ -1,107 +1,168 @@
 import {
     CheckCircle2,
+    ShieldCheck,
     User,
     XCircle,
 } from "lucide-react";
 
-// Importa la interfaz ResultadoReconocimiento de facial.ts
-import type { ResultadoReconocimiento } from "../types/facial";
 import SimilarityBar from "./SimilarityBar";
 
-// Datos que este componente recibirá
+import type { ResultadoReconocimiento } from "../types/facial";
+
+// Datos necesarios para mostrar un resultado facial
 interface FaceResultCardProps {
     resultado: ResultadoReconocimiento;
 }
 
-function FaceResultCard({ resultado }: FaceResultCardProps) {
+function FaceResultCard({
+    resultado,
+}: FaceResultCardProps) {
     return (
-        <div className="rounded-xl border border-gray-200 bg-white p-6">
-            {/* Encabezado del resultado */}
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <User className="text-blue-600" />
+        <div className="flex flex-1 flex-col">
+            {/* Resultado principal */}
+            <div
+                className={`rounded-xl border p-5 ${resultado.coincide
+                        ? "border-brand-100 bg-brand-50"
+                        : "border-red-100 bg-red-50"
+                    }`}
+            >
+                <div className="flex items-start gap-4">
+                    {/* Icono del resultado */}
+                    <div
+                        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${resultado.coincide
+                                ? "bg-brand-100 text-brand"
+                                : "bg-red-100 text-red-700"
+                            }`}
+                    >
+                        {resultado.coincide ? (
+                            <CheckCircle2 size={24} />
+                        ) : (
+                            <XCircle size={24} />
+                        )}
+                    </div>
 
-                    <h3 className="text-xl font-semibold text-gray-800">
-                        Resultado del reconocimiento
-                    </h3>
+                    <div>
+                        <span className="text-xs font-semibold tracking-wider text-muted">
+                            RESULTADO DEL ANÁLISIS
+                        </span>
+
+                        <h3 className="mt-1 font-display text-xl font-semibold text-ink">
+                            {resultado.coincide
+                                ? "Coincidencia encontrada"
+                                : "Sin coincidencia"}
+                        </h3>
+
+                        <p className="mt-2 text-sm leading-6 text-muted">
+                            {resultado.coincide
+                                ? "El nivel de similitud supera el umbral configurado."
+                                : "La similitud obtenida no alcanza el umbral requerido."}
+                        </p>
+                    </div>
                 </div>
-
-                {/* Estado de coincidencia */}
-                {resultado.coincide ? (
-                    <CheckCircle2 className="text-green-600" />
-                ) : (
-                    <XCircle className="text-red-600" />
-                )}
             </div>
 
             {/* Persona identificada */}
-            <div className="mt-6">
-                <p className="text-sm text-gray-500">
-                    Identidad candidata
-                </p>
+            <section className="mt-5 rounded-xl border border-line p-5">
+                <span className="text-xs font-semibold tracking-wider text-muted">
+                    IDENTIDAD CANDIDATA
+                </span>
 
-                {/* Si existe un nombre, úsalo. Si es null, muestra "Desconocido" */}
-                <p className="mt-1 text-2xl font-bold text-gray-800">
-                    {resultado.nombre ?? "Desconocido"}
-                </p>
-            </div>
+                <div className="mt-4 flex items-center gap-4">
+                    {/* Avatar */}
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand">
+                        <User size={22} />
+                    </div>
 
-            {/* Barra de similitud */}
-            <SimilarityBar
-                similitud={resultado.similitud}
-                umbral={resultado.umbral}
-            />
+                    <div>
+                        <p className="font-display text-lg font-semibold text-ink">
+                            {resultado.nombre ??
+                                "Persona desconocida"}
+                        </p>
 
-            {/* Información adicional */}
-            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-                {/* Distancia */}
-                <div className="rounded-lg bg-gray-50 p-4">
-                    <p className="text-sm text-gray-500">
-                        Distancia
-                    </p>
+                        <p className="mt-1 text-xs text-muted">
+                            {resultado.persona_id
+                                ? `ID de persona: ${resultado.persona_id}`
+                                : "Sin identificación registrada"}
+                        </p>
+                    </div>
+                </div>
+            </section>
 
-                    <p className="mt-1 font-semibold text-gray-800">
-                        {resultado.distancia.toFixed(2)}
+            {/* Similitud facial */}
+            <section className="mt-5 rounded-xl border border-line p-5">
+                <div className="mb-5">
+                    <span className="text-xs font-semibold tracking-wider text-muted">
+                        SIMILITUD FACIAL
+                    </span>
+
+                    <p className="mt-2 text-sm text-muted">
+                        Comparación entre el rostro analizado y el registro candidato.
                     </p>
                 </div>
+
+                <SimilarityBar
+                    similitud={resultado.similitud}
+                    umbral={resultado.umbral}
+                />
+            </section>
+
+            {/* Métricas */}
+            <section className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                {/* Distancia */}
+                <article className="rounded-lg border border-line bg-surface p-4">
+                    <span className="text-xs text-muted">
+                        Distancia
+                    </span>
+
+                    <strong className="mt-2 block font-display text-xl font-semibold text-ink">
+                        {resultado.distancia.toFixed(2)}
+                    </strong>
+                </article>
 
                 {/* Umbral */}
-                <div className="rounded-lg bg-gray-50 p-4">
-                    <p className="text-sm text-gray-500">
+                <article className="rounded-lg border border-line bg-surface p-4">
+                    <span className="text-xs text-muted">
                         Umbral
-                    </p>
+                    </span>
 
-                    <p className="mt-1 font-semibold text-gray-800">
+                    <strong className="mt-2 block font-display text-xl font-semibold text-ink">
                         {resultado.umbral.toFixed(2)}
-                    </p>
-                </div>
+                    </strong>
+                </article>
 
-                {/* Probabilidad calibrada */}
-                <div className="rounded-lg bg-gray-50 p-4">
-                    <p className="text-sm text-gray-500">
-                        Probabilidad calibrada
-                    </p>
+                {/* Probabilidad */}
+                <article className="rounded-lg border border-line bg-surface p-4">
+                    <span className="text-xs text-muted">
+                        Probabilidad
+                    </span>
 
-                    <p className="mt-1 font-semibold text-gray-800">
+                    <strong className="mt-2 block font-display text-xl font-semibold text-ink">
                         {resultado.probabilidad_calibrada !== null
-                            ? resultado.probabilidad_calibrada.toFixed(2)
-                            : "No disponible"}
-                    </p>
-                </div>
-            </div>
+                            ? `${(
+                                resultado.probabilidad_calibrada *
+                                100
+                            ).toFixed(1)}%`
+                            : "—"}
+                    </strong>
+                </article>
+            </section>
 
-            {/* Resultado final */}
-            <div
-                className={`mt-6 rounded-lg p-4 ${resultado.coincide
-                    ? "bg-green-50 text-green-700"
-                    : "bg-red-50 text-red-700"
-                    }`}
-            >
-                {/* SI coincide es true --> mostrar mensaje positivo */}
-                {/* SI NO --> mostrar mensaje negativo */}
-                {resultado.coincide
-                    ? "El rostro supera el umbral establecido."
-                    : "El rostro no supera el umbral establecido."}
+            {/* Interpretación final */}
+            <div className="mt-5 flex gap-3 border-t border-line pt-5">
+                <ShieldCheck
+                    size={20}
+                    className="mt-0.5 shrink-0 text-brand"
+                />
+
+                <p className="text-xs leading-5 text-muted">
+                    <strong className="font-semibold text-ink">
+                        Interpretación:
+                    </strong>{" "}
+                    similitud y probabilidad no representan exactamente
+                    lo mismo. La similitud compara rostros, mientras que
+                    la probabilidad calibrada pretende expresar qué tan
+                    confiable es la decisión del modelo.
+                </p>
             </div>
         </div>
     );

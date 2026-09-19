@@ -1,19 +1,14 @@
-// Herramiente de React que ayuda a detectar algunos problemas durante el desarrollo
-import { StrictMode } from 'react'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
 
-// Permite insertar nuestra aplicación React dentro del HTML
-import { createRoot } from 'react-dom/client'
+import "./index.css";
+import App from "./App";
 
-// Carga estilos generales
-import './index.css'
-
-// Importa nuestro componente principal
-import App from './App.tsx'
-
-// Busca el div de id="root" del index.html
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    {/* Muestra el componente App */}
-    <App />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </StrictMode>,
-)
+);
