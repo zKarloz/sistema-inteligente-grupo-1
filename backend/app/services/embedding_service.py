@@ -13,13 +13,33 @@ def get_face_app():
     global _face_app
 
     if _face_app is None:
+        # Reduce el consumo de memoria de ONNX Runtime.
+        session_options = ort.SessionOptions()
+
+        session_options.intra_op_num_threads = 1
+        session_options.inter_op_num_threads = 1
+
+        session_options.execution_mode = (
+            ort.ExecutionMode.ORT_SEQUENTIAL
+        )
+
+        session_options.enable_cpu_mem_arena = False
+        session_options.enable_mem_pattern = False
+
         _face_app = FaceAnalysis(
             name=MODEL_NAME,
             providers=["CPUExecutionProvider"],
-            allowed_modules=["detection", "recognition"],
+            allowed_modules=[
+                "detection",
+                "recognition",
+            ],
+            sess_options=session_options,
         )
 
-        _face_app.prepare(ctx_id=0, det_size=(320, 320),)
+        _face_app.prepare(
+            ctx_id=0,
+            det_size=(320, 320),
+        )
 
     return _face_app
 
