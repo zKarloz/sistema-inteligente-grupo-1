@@ -1,4 +1,6 @@
 import numpy as np
+import onnxruntime as ort
+
 from insightface.app import FaceAnalysis
 
 
@@ -13,16 +15,18 @@ def get_face_app():
     global _face_app
 
     if _face_app is None:
-        # Reduce el consumo de memoria de ONNX Runtime.
         session_options = ort.SessionOptions()
 
+        # Un solo hilo para reducir consumo.
         session_options.intra_op_num_threads = 1
         session_options.inter_op_num_threads = 1
 
+        # Ejecución secuencial.
         session_options.execution_mode = (
             ort.ExecutionMode.ORT_SEQUENTIAL
         )
 
+        # Evita que ONNX reserve memoria adicional.
         session_options.enable_cpu_mem_arena = False
         session_options.enable_mem_pattern = False
 
