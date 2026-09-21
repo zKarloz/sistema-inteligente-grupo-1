@@ -62,7 +62,7 @@ html {
   scrollbar-gutter: stable;
 }
 
-/* Scrollbar moderna y sencilla */
+/* Scrollbar moderno y sencillo */
 
 /* Firefox */
 html {
@@ -116,7 +116,7 @@ button {
   outline-offset: 3px;
 }
 
-/* Evita que muestre la mini tarjeta "Pruébalo ahora F12 → vista móvil" en dispositivos que normalmente no se utilizaría un puntero */
+/* Evita que muestre la mini tarjeta "Pruébalo ahora F12 → vista móvil" en dispositivos en los que normalmente no se utilizaría un puntero */
 .f12-hint {
   display: none;
 }

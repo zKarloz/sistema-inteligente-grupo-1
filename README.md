@@ -87,7 +87,7 @@ Mostrar resultado en React
 **Historial:** muestra los intentos almacenados en `recognition_logs`.  
 **Probabilidades:** muestra el último análisis, la decisión y sus gráficos.
 
-## Base de datos
+## Tablas de la Base de datos
 
 ```text
 personas
