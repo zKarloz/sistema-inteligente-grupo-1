@@ -2,13 +2,35 @@ import cv2
 import numpy as np
 
 
+MAX_SIDE = 640
 MAX_BYTES = 5 * 1024 * 1024
 
 _haar = None
 
 
+def _reducir(image):
+    """Reduce imágenes grandes para ahorrar memoria."""
+
+    alto, ancho = image.shape[:2]
+    lado_mayor = max(alto, ancho)
+
+    if lado_mayor <= MAX_SIDE:
+        return image
+
+    escala = MAX_SIDE / lado_mayor
+
+    return cv2.resize(
+        image,
+        (
+            int(ancho * escala),
+            int(alto * escala),
+        ),
+        interpolation=cv2.INTER_AREA,
+    )
+
+
 def leer_imagen(image_bytes: bytes):
-    """Convierte los bytes recibidos en una imagen OpenCV."""
+    """Convierte bytes en una imagen OpenCV reducida."""
 
     if len(image_bytes) > MAX_BYTES:
         raise ValueError(
@@ -30,11 +52,15 @@ def leer_imagen(image_bytes: bytes):
             "No se pudo leer la imagen."
         )
 
-    return image
+    reducida = _reducir(image)
+
+    del image
+
+    return reducida
 
 
 def _get_haar():
-    """Carga el detector Haar una sola vez."""
+    """Carga Haar una sola vez."""
 
     global _haar
 
@@ -48,7 +74,7 @@ def _get_haar():
 
 
 def detectar_rostros(image):
-    """Realiza una detección facial básica con OpenCV."""
+    """Detección facial básica con OpenCV."""
 
     gray = cv2.cvtColor(
         image,
@@ -64,7 +90,7 @@ def detectar_rostros(image):
 
 
 def calcular_calidad_imagen(image):
-    """Calcula una estimación simple de nitidez."""
+    """Calcula una estimación de nitidez."""
 
     gray = cv2.cvtColor(
         image,
@@ -82,7 +108,7 @@ def calcular_calidad_imagen(image):
 
 
 def calcular_iluminacion(image):
-    """Devuelve iluminación normalizada entre 0 y 1."""
+    """Iluminación normalizada."""
 
     gray = cv2.cvtColor(
         image,

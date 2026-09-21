@@ -4,30 +4,28 @@ import onnxruntime as ort
 from insightface.app import FaceAnalysis
 
 
-MODEL_NAME = "buffalo_l_lite"
+MODEL_NAME = "buffalo_sc"
 MODEL_ROOT = "modelos_cache"
 
 _face_app = None
 
 
 def get_face_app():
-    """Carga únicamente detección y reconocimiento."""
+    """Carga el modelo facial una sola vez."""
 
     global _face_app
 
     if _face_app is None:
         opts = ort.SessionOptions()
 
-        # Reducimos el uso de hilos.
+        # Reducimos el consumo de recursos de ONNX Runtime.
         opts.intra_op_num_threads = 1
         opts.inter_op_num_threads = 1
 
-        # Ejecuta las operaciones de forma secuencial.
         opts.execution_mode = (
             ort.ExecutionMode.ORT_SEQUENTIAL
         )
 
-        # Evita reservas adicionales de memoria.
         opts.enable_cpu_mem_arena = False
         opts.enable_mem_pattern = False
 
@@ -53,7 +51,7 @@ def get_face_app():
 
 
 def generar_embedding(image):
-    """Detecta un rostro y genera su embedding facial."""
+    """Detecta un rostro y genera su embedding."""
 
     face_app = get_face_app()
 
@@ -76,7 +74,6 @@ def generar_embedding(image):
             "No se pudo generar el embedding facial."
         )
 
-    # Normalizamos el embedding.
     norma = np.linalg.norm(embedding)
 
     if norma == 0:
@@ -95,7 +92,7 @@ def similitud_coseno(
     embedding_a,
     embedding_b,
 ):
-    """Calcula la similitud coseno entre dos embeddings."""
+    """Calcula similitud coseno."""
 
     a = np.asarray(
         embedding_a,
