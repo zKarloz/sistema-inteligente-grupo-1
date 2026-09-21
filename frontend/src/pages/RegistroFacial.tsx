@@ -1,7 +1,8 @@
-import { useState, type SubmitEvent } from "react";
-import { registrarPersona, registrarRostro } from "../services/api";
+import { useEffect, useState, type SubmitEvent } from "react";
+import { obtenerPersonas, registrarPersona, registrarRostro } from "../services/api";
 import { CheckCircle2, LoaderCircle, Mail, ShieldCheck, User, UserPlus } from "lucide-react";
 
+import type { Persona } from "../types/facial";
 import CameraCapture from "../components/CameraCapture";
 
 function RegistroFacial() {
@@ -10,8 +11,33 @@ function RegistroFacial() {
     const [email, setEmail] = useState("");
 
     // Guarda la imagen capturada o seleccionada
-    const [imagenFacial, setImagenFacial] =
-        useState<string | null>(null);
+    const [imagenFacial, setImagenFacial] = useState<string | null>(null);
+
+    // Define si se registra una persona nueva o se agrega otro rostro a una existente
+    const [modoRegistro, setModoRegistro] = useState<"nueva" | "existente">("nueva");
+
+    // Lista de personas registradas.
+    const [personas, setPersonas] = useState<Persona[]>([]);
+
+    const [personaSeleccionada, setPersonaSeleccionada] = useState("");
+
+    useEffect(() => {
+        async function cargarPersonas() {
+            try {
+                const datos =
+                    await obtenerPersonas();
+
+                setPersonas(datos);
+            } catch (error) {
+                console.error(
+                    "Error al cargar personas:",
+                    error,
+                );
+            }
+        }
+
+        void cargarPersonas();
+    }, []);
 
     // Mensaje informativo del formulario
     const [mensaje, setMensaje] = useState("");
@@ -24,13 +50,6 @@ function RegistroFacial() {
     ) {
         evento.preventDefault();
 
-        if (!nombre.trim() || !email.trim()) {
-            setMensaje(
-                "Completa el nombre y el correo electrónico.",
-            );
-            return;
-        }
-
         if (!imagenFacial) {
             setMensaje(
                 "Captura o selecciona una imagen antes de continuar.",
@@ -38,32 +57,99 @@ function RegistroFacial() {
             return;
         }
 
+        if (
+            modoRegistro === "nueva" &&
+            (!nombre.trim() || !email.trim())
+        ) {
+            setMensaje(
+                "Completa el nombre y el correo electrónico.",
+            );
+            return;
+        }
+
+        if (
+            modoRegistro === "existente" &&
+            !personaSeleccionada
+        ) {
+            setMensaje(
+                "Selecciona una persona registrada.",
+            );
+            return;
+        }
+
         try {
             setRegistrando(true);
 
-            setMensaje(
-                "Registrando datos personales...",
-            );
+            /*
+                CASO 1:
+                Crear una persona nueva y después
+                registrar su primer rostro.
+            */
+            if (modoRegistro === "nueva") {
+                setMensaje(
+                    "Registrando datos personales...",
+                );
 
-            // Primero creamos la persona.
-            const persona = await registrarPersona({
-                nombre: nombre.trim(),
-                email: email.trim(),
-            });
+                const persona =
+                    await registrarPersona({
+                        nombre: nombre.trim(),
+                        email: email.trim(),
+                    });
 
-            setMensaje(
-                "Persona registrada. Procesando rostro...",
-            );
+                // Agregamos la nueva persona al selector
+                // sin necesidad de recargar la página.
+                setPersonas((actuales) => [
+                    ...actuales,
+                    persona,
+                ]);
 
-            // Luego asociamos el rostro a su ID.
-            await registrarRostro(
-                persona.id,
-                imagenFacial,
-            );
+                setMensaje(
+                    "Persona registrada. Procesando rostro...",
+                );
 
-            setMensaje(
-                `Registro completado correctamente para ${persona.nombre}.`,
-            );
+                await registrarRostro(
+                    persona.id,
+                    imagenFacial,
+                );
+
+                setMensaje(
+                    `Registro completado correctamente para ${persona.nombre}.`,
+                );
+
+                setNombre("");
+                setEmail("");
+            }
+
+            /*
+                CASO 2:
+                La persona ya existe.
+                Solamente agregamos otro rostro.
+            */
+            if (modoRegistro === "existente") {
+                setMensaje(
+                    "Procesando nuevo rostro...",
+                );
+
+                await registrarRostro(
+                    Number(personaSeleccionada),
+                    imagenFacial,
+                );
+
+                const persona =
+                    personas.find(
+                        (item) =>
+                            item.id ===
+                            Number(
+                                personaSeleccionada,
+                            ),
+                    );
+
+                setMensaje(
+                    `Nuevo rostro registrado correctamente para ${persona?.nombre ?? "la persona seleccionada"}.`,
+                );
+            }
+
+            setImagenFacial(null);
         } catch (error) {
             console.error(
                 "Error durante el registro:",
@@ -83,8 +169,41 @@ function RegistroFacial() {
 
             {/* Contenido principal */}
             <section className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+
                 {/* Formulario */}
                 <article className="rounded-xl border border-line bg-white p-5 sm:p-6">
+
+                    {/* Tipo de registro */}
+                    <div className="mb-6 grid grid-cols-2 gap-2 rounded-lg bg-surface p-1">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setModoRegistro("nueva");
+                                setMensaje("");
+                            }}
+                            className={`rounded-md px-3 py-2.5 text-sm font-semibold transition ${modoRegistro === "nueva"
+                                ? "bg-white text-brand shadow-sm"
+                                : "text-muted hover:text-ink"
+                                }`}
+                        >
+                            Nueva persona
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setModoRegistro("existente");
+                                setMensaje("");
+                            }}
+                            className={`rounded-md px-3 py-2.5 text-sm font-semibold transition ${modoRegistro === "existente"
+                                ? "bg-white text-brand shadow-sm"
+                                : "text-muted hover:text-ink"
+                                }`}
+                        >
+                            Agregar rostro
+                        </button>
+                    </div>
+
                     {/* Paso actual */}
                     <div className="mb-6 flex items-center gap-3">
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-sm font-bold text-brand">
@@ -104,53 +223,91 @@ function RegistroFacial() {
 
                     {/* Formulario de registro */}
                     <form onSubmit={manejarRegistro}>
-                        {/* Nombre */}
-                        <label className="block">
-                            <span className="text-sm font-medium text-ink">
-                                Nombre completo
-                            </span>
+                        {modoRegistro === "nueva" ? (
+                            <>
+                                {/* Nombre */}
+                                <label className="block">
+                                    <span className="text-sm font-medium text-ink">
+                                        Nombre completo
+                                    </span>
 
-                            <div className="relative mt-2">
-                                <User
-                                    size={17}
-                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
-                                />
+                                    <div className="relative mt-2">
+                                        <User
+                                            size={17}
+                                            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+                                        />
 
-                                <input
-                                    type="text"
-                                    value={nombre}
+                                        <input
+                                            type="text"
+                                            value={nombre}
+                                            onChange={(evento) =>
+                                                setNombre(evento.target.value)
+                                            }
+                                            placeholder="Ejemplo: Carlos Pérez"
+                                            className="w-full rounded-lg border border-line bg-white py-3 pl-10 pr-3 text-sm text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand-100"
+                                        />
+                                    </div>
+                                </label>
+
+                                {/* Correo */}
+                                <label className="mt-5 block">
+                                    <span className="text-sm font-medium text-ink">
+                                        Correo electrónico
+                                    </span>
+
+                                    <div className="relative mt-2">
+                                        <Mail
+                                            size={17}
+                                            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+                                        />
+
+                                        <input
+                                            type="email"
+                                            value={email}
+                                            onChange={(evento) =>
+                                                setEmail(evento.target.value)
+                                            }
+                                            placeholder="persona@correo.com"
+                                            className="w-full rounded-lg border border-line bg-white py-3 pl-10 pr-3 text-sm text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand-100"
+                                        />
+                                    </div>
+                                </label>
+                            </>
+                        ) : (
+                            <label className="block">
+                                <span className="text-sm font-medium text-ink">
+                                    Persona registrada
+                                </span>
+
+                                <select
+                                    value={personaSeleccionada}
                                     onChange={(evento) =>
-                                        setNombre(evento.target.value)
+                                        setPersonaSeleccionada(
+                                            evento.target.value,
+                                        )
                                     }
-                                    placeholder="Ejemplo: Carlos Pérez"
-                                    className="w-full rounded-lg border border-line bg-white py-3 pl-10 pr-3 text-sm text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand-100"
-                                />
-                            </div>
-                        </label>
+                                    className="mt-2 w-full rounded-lg border border-line bg-white px-3 py-3 text-sm text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand-100"
+                                >
+                                    <option value="">
+                                        Selecciona una persona
+                                    </option>
 
-                        {/* Correo electrónico */}
-                        <label className="mt-5 block">
-                            <span className="text-sm font-medium text-ink">
-                                Correo electrónico
-                            </span>
+                                    {personas.map((persona) => (
+                                        <option
+                                            key={persona.id}
+                                            value={persona.id}
+                                        >
+                                            {persona.nombre} — {persona.email}
+                                        </option>
+                                    ))}
+                                </select>
 
-                            <div className="relative mt-2">
-                                <Mail
-                                    size={17}
-                                    className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
-                                />
-
-                                <input
-                                    type="email"
-                                    value={email}
-                                    onChange={(evento) =>
-                                        setEmail(evento.target.value)
-                                    }
-                                    placeholder="persona@correo.com"
-                                    className="w-full rounded-lg border border-line bg-white py-3 pl-10 pr-3 text-sm text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand-100"
-                                />
-                            </div>
-                        </label>
+                                <p className="mt-2 text-xs text-muted">
+                                    El nuevo rostro se agregará a esta persona
+                                    sin crear un registro nuevo.
+                                </p>
+                            </label>
+                        )}
 
                         {/* Nota informativa */}
                         <div className="mt-6 flex gap-3 rounded-lg border border-brand-100 bg-brand-50 p-4">
@@ -236,17 +393,29 @@ function RegistroFacial() {
                             disabled={registrando}
                             className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
                         >
-                            <UserPlus size={18} />
+                            {registrando ? (
+                                <LoaderCircle
+                                    size={18}
+                                    className="animate-spin"
+                                />
+                            ) : (
+                                <UserPlus size={18} />
+                            )}
 
                             {registrando
-                                ? "Registrando..."
-                                : "Registrar persona"}
+                                ? "Procesando..."
+                                : modoRegistro === "nueva"
+                                    ? "Registrar persona"
+                                    : "Agregar rostro"}
                         </button>
                     </form>
                 </article>
 
                 {/* Captura facial */}
                 <article className="rounded-xl border border-line bg-white p-5 sm:p-6">
+
+
+
                     {/* Paso actual */}
                     <div className="mb-6 flex items-center gap-3">
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-sm font-bold text-brand">

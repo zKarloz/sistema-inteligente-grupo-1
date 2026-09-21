@@ -22,3 +22,6 @@ models/*.onnx
 
 # Este modelo sí se despliega con el backend
 !models/modelo_probabilidad.joblib
+
+# Modelos de InsightFace descargados automáticamente
+modelos_cache/
