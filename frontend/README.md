@@ -119,6 +119,7 @@ src/
 │   │   └── Topbar.tsx
 │   ├── CameraCapture.tsx
 │   ├── FaceResultCard.tsx
+│   ├── LoadingState.tsx
 │   ├── SimilarityBar.tsx
 │   └── ProbabilityChart.tsx
 │
@@ -214,7 +215,7 @@ Se utilizó:
 - `react-webcam`
 - Props entre componentes.
 
-En esta etapa inicial los datos todavía no se enviaban al backend. La integración real se realizó posteriormente durante la Fase 13.
+En esta etapa inicial los datos todavía no se enviaban al backend. La integración real se realizó posteriormente durante la Fase 13, donde también se añadió la posibilidad de agregar más de un rostro a una persona existente.
 
 ---
 
@@ -581,26 +582,39 @@ Después de completar el backend se reemplazaron progresivamente los datos simul
 
 ```text
 POST /api/personas
+GET  /api/personas
 POST /api/personas/{id}/rostro
 ```
 
-El flujo actual es:
+La pantalla actualmente dispone de dos modos:
 
 ```text
-Formulario
+Nueva persona
+   ↓
+Nombre + correo
    ↓
 Crear persona
    ↓
 Capturar o seleccionar imagen
    ↓
-Enviar imagen
+Registrar primer rostro
+
+Agregar rostro
    ↓
-Generar embedding en el backend
+Seleccionar persona existente
    ↓
-Guardar rostro en la base de datos
+Capturar o seleccionar otra imagen
+   ↓
+Registrar un nuevo embedding
+   ↓
+Mantener el mismo persona_id
 ```
 
+Esto permite asociar varias muestras faciales a una misma persona sin crear registros duplicados.
+
 `CameraCapture.tsx` continúa entregando la imagen como Data URL y `services/api.ts` realiza la conversión necesaria para enviarla al backend mediante `FormData`.
+
+La lista de personas existentes se obtiene al cargar la página. Cuando se crea una persona nueva, también se agrega al estado local para que pueda seleccionarse sin recargar el navegador.
 
 ---
 
@@ -833,6 +847,14 @@ Muestra:
 
 ---
 
+## `LoadingState.tsx`
+
+Muestra un estado de carga reutilizable mientras se consultan datos reales del backend.
+
+Se utiliza para evitar pantallas vacías mientras se esperan respuestas de Render/Supabase.
+
+---
+
 ## `SimilarityBar.tsx`
 
 Representa visualmente:
@@ -913,13 +935,15 @@ Usuario
    ↓
 React / Vercel
    ↓
+Registro de persona o rostro adicional
+   ↓
 Captura facial
    ↓
 Axios
    ↓
 FastAPI / Render
    ↓
-OpenCV + InsightFace
+OpenCV + InsightFace (buffalo_sc)
    ↓
 Embedding y comparación
    ↓
@@ -931,6 +955,18 @@ Respuesta al frontend
    ↓
 Dashboard / Historial / Probabilidades
 ```
+
+---
+
+# Mejoras posteriores al despliegue
+
+Después de las primeras pruebas en producción se realizaron ajustes adicionales:
+
+- El Registro Facial permite alternar entre **Nueva persona** y **Agregar rostro**.
+- Una persona puede registrar varias imágenes faciales y, por tanto, varios embeddings asociados al mismo `persona_id`.
+- Se añadieron estados visuales de procesamiento durante el registro y otras consultas.
+- El frontend continúa usando los mismos endpoints públicos; el cambio del modelo facial a `buffalo_sc` se realizó en el backend.
+- Se verificó el flujo completo en producción con personas registradas, imágenes nuevas y personas desconocidas.
 
 ---
 

@@ -46,6 +46,9 @@ backend/
 │           └── probabilities.py
 ├── models/
 │   └── modelo_probabilidad.joblib
+├── scripts/
+│   └── preparar_buffalo_sc.py
+├── modelos_cache/              # generado automáticamente, no se versiona
 ├── requirements.txt
 ├── .env
 └── .gitignore
@@ -133,6 +136,8 @@ Se utilizó OpenCV para:
 - leer los bytes recibidos;
 - convertirlos en imagen;
 - validar que la imagen sea válida;
+- limitar el tamaño recibido a 5 MB;
+- reducir imágenes grandes a un máximo de 640 px por su lado mayor;
 - detectar rostros;
 - preparar la imagen para el siguiente procesamiento.
 
@@ -153,7 +158,15 @@ Estas variables posteriormente se utilizaron en Machine Learning.
 
 ## Fase 4 — Deep Learning y embeddings
 
-Se integró InsightFace con el modelo ArcFace.
+Se integró InsightFace para generar representaciones faciales mediante embeddings.
+
+La primera versión utilizó `buffalo_l`. Durante las pruebas en Render, ese paquete superó el límite de memoria disponible de la instancia de 512 MB. Después de probar una carga reducida de `buffalo_l`, se migró finalmente a:
+
+```text
+buffalo_sc
+```
+
+Esta variante mantiene el flujo de detección y reconocimiento facial, pero utiliza muchos menos recursos y permitió ejecutar el análisis correctamente en producción.
 
 Archivo principal:
 
@@ -183,6 +196,8 @@ Los embeddings se guardan en:
 face_embeddings
 ```
 
+Una misma persona puede tener varios embeddings asociados al mismo `persona_id`, permitiendo registrar diferentes fotografías, ángulos o condiciones de captura sin duplicar a la persona.
+
 También se implementó la similitud coseno para comparar dos embeddings.
 
 La similitud indica qué tan cercanos son dos rostros representados matemáticamente.
@@ -201,15 +216,15 @@ El backend:
 
 1. recibe una imagen;
 2. genera su embedding;
-3. consulta los rostros registrados;
-4. compara el nuevo embedding con los existentes;
-5. encuentra la mayor similitud;
+3. consulta todos los rostros registrados;
+4. compara el nuevo embedding con los embeddings existentes;
+5. conserva la mayor similitud encontrada, incluso cuando una persona tiene varias muestras;
 6. calcula la distancia;
 7. compara la similitud con un umbral;
 8. determina si existe coincidencia;
 9. guarda el resultado en el historial.
 
-Se utilizó inicialmente un umbral:
+Se mantiene actualmente un umbral:
 
 ```text
 0.50
@@ -287,7 +302,25 @@ CalibratedClassifierCV
 
 El modelo genera una probabilidad calibrada.
 
-El dataset utilizado durante las pruebas llegó a 32 registros reales.
+Después de migrar de `buffalo_l` a `buffalo_sc`, los registros de entrenamiento anteriores se descartaron para no mezclar similitudes generadas por modelos diferentes.
+
+El modelo actual se reentrenó con:
+
+```text
+20 registros reales
+10 positivos
+10 negativos
+```
+
+Con una división de prueba del 25 %, el conjunto de evaluación quedó formado por 5 registros. En esa prueba concreta el modelo clasificó correctamente los 5 casos:
+
+```text
+Matriz de confusión
+[[3, 0],
+ [0, 2]]
+```
+
+Las métricas obtenidas en ese conjunto fueron Accuracy, Precision, Recall y F1 iguales a 1.0, con tasa de falsos positivos y falsos negativos igual a 0. Estos valores describen únicamente ese pequeño conjunto de prueba y no deben interpretarse como una precisión universal del sistema.
 
 ### Métricas implementadas
 
@@ -381,10 +414,22 @@ Se realizó:
 - configuración de CORS;
 - permiso explícito para el frontend de Vercel;
 - configuración de Render;
+- migración del modelo facial a `buffalo_sc` para reducir el consumo de memoria;
+- preparación automática del modelo durante el build;
+- reducción de imágenes grandes antes del análisis;
+- límite de 5 MB para imágenes recibidas;
 - conexión del backend desplegado con Supabase;
 - conexión del frontend desplegado con el backend.
 
-Comando de producción utilizado en Render:
+Build Command utilizado en Render:
+
+```bash
+pip install -r requirements.txt && python scripts/preparar_buffalo_sc.py
+```
+
+El script descarga/prepara `buffalo_sc` durante el build. Los archivos generados se guardan en `modelos_cache/`, carpeta excluida del repositorio.
+
+Start Command utilizado en Render:
 
 ```bash
 uvicorn app.main:app --host 0.0.0.0 --port $PORT
@@ -407,7 +452,10 @@ Completado:
 - conexión Vercel ↔ Render;
 - configuración CORS;
 - variables de entorno;
-- pruebas de rutas públicas.
+- pruebas de rutas públicas;
+- reconocimiento facial estable con `buffalo_sc`;
+- reentrenamiento del modelo `.joblib` con datos compatibles con `buffalo_sc`;
+- verificación de consistencia entre `/api/reconocimiento` y `/api/probabilidades/prediccion`.
 
 Pendiente para una versión más completa:
 
@@ -415,7 +463,6 @@ Pendiente para una versión más completa:
 - roles y permisos;
 - auditoría avanzada;
 - migraciones con Alembic;
-- límites de tamaño de archivos;
 - rate limiting;
 - políticas de retención y protección de datos biométricos.
 
@@ -515,6 +562,30 @@ El archivo `.env` no debe subirse a GitHub.
 
 ---
 
+# Optimización final para producción
+
+Durante las pruebas en Render se detectó un error de memoria al analizar rostros con `buffalo_l`:
+
+```text
+Ran out of memory (used over 512MB)
+```
+
+Se evaluó una versión reducida de `buffalo_l`, pero el consumo continuó siendo demasiado alto. La solución final fue migrar a `buffalo_sc`.
+
+La migración requirió:
+
+- volver a generar los embeddings faciales;
+- volver a validar el umbral de similitud;
+- generar nuevos registros de `ml_training_records`;
+- reentrenar `modelo_probabilidad.joblib`;
+- mantener `preparar_buffalo_sc.py` para los builds de Render.
+
+Se registraron cinco personas y se realizaron pruebas con imágenes distintas a las utilizadas durante el registro, además de personas desconocidas. En estas pruebas no se observaron falsos positivos ni falsos negativos con el umbral actual de `0.50`.
+
+También se comprobó que una predicción realizada inmediatamente después de un reconocimiento devuelve la misma `probabilidad_calibrada` cuando se utilizan los mismos valores de similitud, calidad e iluminación.
+
+---
+
 # Resultado final
 
 El backend permite:
@@ -522,9 +593,9 @@ El backend permite:
 ```text
 Registrar una persona
         ↓
-Registrar su rostro
+Registrar uno o más rostros
         ↓
-Generar embedding facial
+Generar embeddings faciales
         ↓
 Guardar embedding
         ↓

@@ -1,6 +1,6 @@
 # Sistema Inteligente de Reconocimiento Facial - Grupo 1 - Semestre IV
 
-Proyecto académico de control de acceso mediante reconocimiento facial, integrando Frontend, Backend, Base de Datos, Deep Learning y Machine Learning.
+Proyecto académico de control de acceso mediante reconocimiento facial con Frontend, Backend, Base de Datos, Deep Learning y Machine Learning.
 
 ## Arquitectura
 
@@ -23,21 +23,19 @@ PostgreSQL / Supabase
 ## Tecnologías
 
 **Frontend:** React, Vite, TypeScript, Tailwind CSS, React Router DOM, Axios, React Webcam, Recharts y Lucide React.  
-**Backend:** Python, FastAPI, Uvicorn, SQLAlchemy, OpenCV, NumPy, InsightFace / ArcFace, ONNX Runtime, scikit-learn y joblib.  
+**Backend:** Python, FastAPI, Uvicorn, SQLAlchemy, OpenCV, NumPy, InsightFace, ONNX Runtime, scikit-learn y joblib.  
 **Servicios:** Supabase, Render, Vercel y GitHub.
 
 ## Funcionalidades principales
 
-- Registro de personas.
-- Registro facial mediante cámara o imagen.
+- Registro de personas y de uno o varios rostros por persona.
 - Generación y almacenamiento de embeddings.
-- Reconocimiento facial con similitud coseno.
-- Cálculo de distancia y umbral.
-- Cálculo de calidad e iluminación de imagen.
+- Reconocimiento facial mediante similitud coseno.
+- Cálculo de distancia, calidad, iluminación y umbral.
 - Probabilidad calibrada con Machine Learning.
-- Historial de reconocimientos.
-- Dashboard con estadísticas reales.
+- Historial de reconocimientos y Dashboard con datos reales.
 - Visualización de similitud, probabilidad y resultados.
+- Despliegue funcional en Vercel, Render y Supabase.
 
 ## Estructura general
 
@@ -51,30 +49,26 @@ sistema-inteligente/
     ├── README.md
     ├── app/
     ├── models/
+    ├── scripts/preparar_buffalo_sc.py
     └── requirements.txt
 ```
 
-Documentación detallada:
-
-```text
-frontend/README.md
-backend/README.md
-```
+`backend/modelos_cache/` se genera automáticamente y no se versiona en Git.
 
 ## Flujo principal
 
 ```text
 Registrar persona
   ↓
-Registrar rostro
+Registrar uno o más rostros
   ↓
-Generar embedding
+Generar embeddings con buffalo_sc
   ↓
 Guardar en Supabase
   ↓
 Capturar nuevo rostro
   ↓
-Comparar embeddings
+Comparar embeddings y tomar la mayor similitud
   ↓
 Aplicar umbral
   ↓
@@ -87,15 +81,13 @@ Mostrar resultado en React
 
 ## Módulos
 
-**Dashboard:** personas registradas, reconocimientos, accesos aceptados, rechazados y actividad reciente.  
-**Registro Facial:** crea una persona y asocia una imagen facial.  
+**Dashboard:** estadísticas y actividad reciente.  
+**Registro Facial:** crea una persona o agrega nuevos rostros a una persona existente.  
 **Reconocimiento:** devuelve persona, similitud, distancia, umbral, coincidencia y probabilidad calibrada.  
-**Historial:** muestra los intentos de reconocimiento guardados.  
-**Probabilidades:** muestra el último análisis con probabilidad calibrada y gráficos.
+**Historial:** muestra los intentos almacenados en `recognition_logs`.  
+**Probabilidades:** muestra el último análisis, la decisión y sus gráficos.
 
 ## Base de datos
-
-Tablas principales:
 
 ```text
 personas
@@ -104,29 +96,27 @@ recognition_logs
 ml_training_records
 ```
 
+Una persona puede tener varios registros en `face_embeddings`.
+
+## Reconocimiento facial
+
+El backend utiliza **InsightFace con `buffalo_sc`**, elegido por su menor consumo de memoria en Render. El sistema compara el embedding recibido contra todos los embeddings registrados y conserva la mayor similitud.
+
+Umbral actual: `0.50`.
+
+Durante las pruebas realizadas con personas registradas y desconocidas no se observaron falsos positivos ni falsos negativos. Este resultado corresponde únicamente a esas pruebas.
+
 ## Machine Learning
 
-Entradas:
+Entradas: `similitud`, `calidad_imagen`, `iluminacion`.
 
-```text
-similitud
-calidad_imagen
-iluminacion
-```
+Variable objetivo: `resultado_real`.
 
-Variable objetivo:
+Modelo: `LogisticRegression + CalibratedClassifierCV`.
 
-```text
-resultado_real
-```
+Después de migrar a `buffalo_sc`, el modelo se reentrenó con 20 registros: 10 positivos y 10 negativos. La división de prueba evaluó 5 registros y los 5 fueron clasificados correctamente; estas métricas no representan una precisión universal.
 
-Modelo:
-
-```text
-LogisticRegression + CalibratedClassifierCV
-```
-
-Métricas: Accuracy, Precision, Recall, F1, matriz de confusión, falsos positivos y falsos negativos.
+Métricas implementadas: Accuracy, Precision, Recall, F1, matriz de confusión, tasa de falsos positivos y tasa de falsos negativos.
 
 ## Endpoints principales
 
@@ -158,16 +148,12 @@ Backend:
 ```bash
 cd backend
 python -m venv .venv
-source .venv/Scripts/activate
+.venv\Scripts\activate
 python -m pip install -r requirements.txt
 uvicorn app.main:app --reload --env-file .env
 ```
 
-Swagger:
-
-```text
-http://127.0.0.1:8000/docs
-```
+Swagger: `http://127.0.0.1:8000/docs`
 
 ## Variables de entorno
 
@@ -193,6 +179,18 @@ Los archivos `.env` no deben subirse al repositorio.
 - Frontend: Vercel
 - Backend: Render
 - Base de datos: Supabase
+
+Build del backend:
+
+```bash
+pip install -r requirements.txt && python scripts/preparar_buffalo_sc.py
+```
+
+Inicio del backend:
+
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
 
 **Backend:** https://sistema-inteligente-grupo-1.onrender.com  
 **Frontend:** https://sistema-inteligente-grupo-1-frontend.vercel.app
