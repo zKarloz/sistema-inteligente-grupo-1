@@ -1,10 +1,5 @@
 import { useState } from "react";
-import {
-    Info,
-    ScanFace,
-    ShieldCheck,
-    Sparkles,
-} from "lucide-react";
+import { Info, LoaderCircle, ScanFace, ShieldCheck, Sparkles } from "lucide-react";
 
 import CameraCapture from "../components/CameraCapture";
 import FaceResultCard from "../components/FaceResultCard";
@@ -120,10 +115,17 @@ function Reconocimiento() {
                         onClick={analizarRostro}
                         className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                        <ScanFace size={18} />
+                        {analizando ? (
+                            <LoaderCircle
+                                size={18}
+                                className="animate-spin"
+                            />
+                        ) : (
+                            <ScanFace size={18} />
+                        )}
 
                         {analizando
-                            ? "Analizando..."
+                            ? "Analizando rostro..."
                             : "Analizar rostro"}
                     </button>
                     {mensaje && (
@@ -174,8 +176,42 @@ function Reconocimiento() {
                         <FaceResultCard
                             resultado={resultado}
                         />
+                    ) : analizando ? (
+                        /* Estado mientras FastAPI analiza el rostro */
+                        <div className="flex flex-1 flex-col items-center justify-center rounded-xl border border-brand-100 bg-brand-50 px-6 py-12 text-center">
+                            {/* Animación principal */}
+                            <div className="relative flex h-20 w-20 items-center justify-center">
+                                {/* Círculo exterior pulsante */}
+                                <div className="absolute h-20 w-20 animate-ping rounded-full bg-brand-100 opacity-40" />
+
+                                {/* Círculo principal */}
+                                <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-white text-brand">
+                                    <LoaderCircle
+                                        size={30}
+                                        className="animate-spin"
+                                    />
+                                </div>
+                            </div>
+
+                            <h3 className="mt-6 font-display text-lg font-semibold text-ink">
+                                Analizando rostro
+                            </h3>
+
+                            <p className="mt-2 max-w-sm text-sm leading-6 text-muted">
+                                Procesando la imagen y comparando
+                                las características faciales con
+                                los registros disponibles.
+                            </p>
+
+                            {/* Indicador inferior */}
+                            <div className="mt-6 flex items-center gap-2 text-xs font-medium text-brand">
+                                <span className="h-2 w-2 animate-pulse rounded-full bg-brand" />
+
+                                Procesando reconocimiento...
+                            </div>
+                        </div>
                     ) : (
-                        /* Estado vacío */
+                        /* Estado inicial */
                         <div className="flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-line bg-surface px-6 py-12 text-center">
                             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-50 text-brand">
                                 <Sparkles size={28} />

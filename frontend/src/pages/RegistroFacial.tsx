@@ -1,12 +1,6 @@
 import { useState, type SubmitEvent } from "react";
 import { registrarPersona, registrarRostro } from "../services/api";
-import {
-    CheckCircle2,
-    Mail,
-    ShieldCheck,
-    User,
-    UserPlus,
-} from "lucide-react";
+import { CheckCircle2, LoaderCircle, Mail, ShieldCheck, User, UserPlus } from "lucide-react";
 
 import CameraCapture from "../components/CameraCapture";
 
@@ -209,11 +203,31 @@ function RegistroFacial() {
                             </div>
                         </div>
 
-                        {/* Mensaje de validación */}
+                        {/* Mensaje de validación animado */}
                         {mensaje && (
-                            <p className="mt-5 rounded-lg border border-line bg-surface px-4 py-3 text-xs leading-5 text-muted">
-                                {mensaje}
-                            </p>
+                            <div
+                                className={`mt-5 flex items-center gap-3 rounded-lg border px-4 py-3 ${registrando
+                                    ? "border-brand-100 bg-brand-50"
+                                    : "border-line bg-surface"
+                                    }`}
+                            >
+                                {registrando && (
+                                    <div className="relative flex h-9 w-9 shrink-0 items-center justify-center">
+                                        <div className="absolute h-9 w-9 animate-ping rounded-full bg-brand-100 opacity-40" />
+
+                                        <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-white text-brand">
+                                            <LoaderCircle
+                                                size={17}
+                                                className="animate-spin"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                <p className="text-xs leading-5 text-muted">
+                                    {mensaje}
+                                </p>
+                            </div>
                         )}
 
                         {/* Botón principal */}

@@ -1,15 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-    ArrowRight,
-    ArrowUpRight,
-    CheckCircle2,
-    ScanFace,
-    ShieldCheck,
-    ShieldX,
-    Users,
-} from "lucide-react";
+import { ArrowRight, ArrowUpRight, CheckCircle2, ScanFace, ShieldCheck, ShieldX, Users } from "lucide-react";
 
+import LoadingState from "../components/LoadingState";
 import ProbabilityChart from "../components/ProbabilityChart";
 import { obtenerHistorial, obtenerPersonas } from "../services/api";
 import type { HistorialReconocimiento, Persona } from "../types/facial";
@@ -179,8 +172,8 @@ function Dashboard() {
             </section>
 
             {cargando && (
-                <div className="my-5 rounded-xl border border-line bg-white p-5 text-sm text-muted">
-                    Cargando información del dashboard...
+                <div className="my-5">
+                    <LoadingState mensaje="Cargando información del dashboard..." />
                 </div>
             )}
 

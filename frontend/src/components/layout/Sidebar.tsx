@@ -1,8 +1,5 @@
 import { NavLink } from "react-router-dom";
-import {
-    ScanFace,
-    ShieldCheck,
-} from "lucide-react";
+import { ScanFace, ShieldCheck } from "lucide-react";
 
 import { navegacion } from "../../config/navigation";
 

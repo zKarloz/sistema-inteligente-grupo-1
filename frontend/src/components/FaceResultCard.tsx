@@ -1,9 +1,4 @@
-import {
-    CheckCircle2,
-    ShieldCheck,
-    User,
-    XCircle,
-} from "lucide-react";
+import { CheckCircle2, ShieldCheck, User, XCircle } from "lucide-react";
 
 import SimilarityBar from "./SimilarityBar";
 

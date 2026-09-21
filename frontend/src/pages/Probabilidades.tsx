@@ -1,15 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-    ArrowRight,
-    BrainCircuit,
-    Gauge,
-    Info,
-    Ruler,
-    ScanFace,
-    Target,
-} from "lucide-react";
+import { ArrowRight, BrainCircuit, Gauge, Info, Ruler, ScanFace, Target } from "lucide-react";
 
+import LoadingState from "../components/LoadingState";
 import ProbabilityChart from "../components/ProbabilityChart";
 import SimilarityBar from "../components/SimilarityBar";
 import { obtenerHistorial } from "../services/api";
@@ -144,8 +137,8 @@ function Probabilidades() {
             </section>
 
             {cargando && (
-                <div className="mb-5 rounded-xl border border-line bg-white p-5 text-sm text-muted">
-                    Cargando último análisis...
+                <div className="my-5">
+                    <LoadingState mensaje="Cargando último análisis..." />
                 </div>
             )}
 

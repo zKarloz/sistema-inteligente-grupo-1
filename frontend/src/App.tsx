@@ -1,8 +1,4 @@
-import {
-  Navigate,
-  Route,
-  Routes,
-} from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 
 // Importa Sidebar (panel lateral izquierdo de opciones que llevan a las 5 páginas principales)
 // Importa Topbar (Cabezera del contenido de la página seleccionada del Sidebar)
@@ -31,48 +27,21 @@ function App() {
           {/* Rutas del sistema */}
           <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">
             <Routes>
-              <Route
-                path="/"
-                element={<Dashboard />}
-              />
-
-              <Route
-                path="/registro"
-                element={<RegistroFacial />}
-              />
-
-              <Route
-                path="/reconocimiento"
-                element={<Reconocimiento />}
-              />
-
-              <Route
-                path="/probabilidades"
-                element={<Probabilidades />}
-              />
-
-              <Route
-                path="/historial"
-                element={<Historial />}
-              />
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/registro" element={<RegistroFacial />} />
+              <Route path="/reconocimiento" element={<Reconocimiento />} />
+              <Route path="/probabilidades" element={<Probabilidades />} />
+              <Route path="/historial" element={<Historial />} />
 
               {/* Si la URL no existe, vuelve al Dashboard */}
-              <Route
-                path="*"
-                element={<Navigate to="/" replace />}
-              />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
 
           {/* Pie de página */}
           <footer className="flex flex-col gap-1 px-4 pb-6 text-xs text-muted sm:px-6 lg:flex-row lg:justify-between lg:px-8">
-            <span>
-              Sistema inteligente de reconocimiento facial
-            </span>
-
-            <span>
-              Frontend · React + TypeScript
-            </span>
+            <span>Sistema inteligente de reconocimiento facial</span>
+            <span>Versión 1.0.0</span>
           </footer>
         </div>
       </div>

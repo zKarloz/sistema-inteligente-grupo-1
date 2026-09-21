@@ -1,16 +1,6 @@
-import {
-    useRef,
-    useState,
-    type ChangeEvent,
-} from "react";
+import { useRef, useState, type ChangeEvent } from "react";
 import Webcam from "react-webcam";
-import {
-    Camera,
-    CheckCircle2,
-    ImagePlus,
-    RotateCcw,
-    ScanFace,
-} from "lucide-react";
+import { Camera, CheckCircle2, ImagePlus, RotateCcw, ScanFace } from "lucide-react";
 
 // Datos que el componente envía hacia la página padre
 interface CameraCaptureProps {

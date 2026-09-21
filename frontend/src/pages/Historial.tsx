@@ -1,12 +1,7 @@
 import { useEffect, useState } from "react";
-import {
-    CheckCircle2,
-    History as HistoryIcon,
-    Search,
-    UserRound,
-    XCircle,
-} from "lucide-react";
+import { CheckCircle2, History as HistoryIcon, Search, UserRound, XCircle } from "lucide-react";
 
+import LoadingState from "../components/LoadingState";
 import type { HistorialReconocimiento } from "../types/facial";
 import { obtenerHistorial } from "../services/api";
 
@@ -119,8 +114,8 @@ function Historial() {
             </section>
 
             {cargando && (
-                <div className="mb-5 rounded-xl border border-line bg-white p-5 text-sm text-muted">
-                    Cargando historial...
+                <div className="my-5">
+                    <LoadingState mensaje="Cargando historial..." />
                 </div>
             )}
 
