@@ -30,11 +30,11 @@ function Topbar() {
                 <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
 
                 <span className="hidden sm:inline">
-                    Modo demostración
+                    Modo administrador
                 </span>
 
                 <span className="sm:hidden">
-                    Demo
+                    Modo admin
                 </span>
             </div>
         </header>

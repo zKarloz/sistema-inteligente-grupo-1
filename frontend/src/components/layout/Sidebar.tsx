@@ -102,11 +102,7 @@ function Sidebar() {
 
                     <div className="ml-3 hidden lg:block">
                         <p className="text-xs font-semibold text-ink">
-                            Administrador demo
-                        </p>
-
-                        <p className="mt-1 text-xs text-muted">
-                            Proyecto académico
+                            Administrador
                         </p>
                     </div>
                 </div>
