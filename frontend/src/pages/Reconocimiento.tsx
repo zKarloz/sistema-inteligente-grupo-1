@@ -10,6 +10,7 @@ import CameraCapture from "../components/CameraCapture";
 import FaceResultCard from "../components/FaceResultCard";
 
 import type { ResultadoReconocimiento } from "../types/facial";
+import { reconocerRostro } from "../services/api";
 
 function Reconocimiento() {
     // Guarda la fotografía que se utilizará para el análisis
@@ -20,29 +21,46 @@ function Reconocimiento() {
     const [resultado, setResultado] =
         useState<ResultadoReconocimiento | null>(null);
 
+    const [analizando, setAnalizando] = useState(false);
+
+    const [mensaje, setMensaje] = useState("");
+
     // Actualiza la imagen y elimina resultados anteriores
     function manejarCaptura(imagen: string | null) {
         setImagenFacial(imagen);
         setResultado(null);
     }
 
-    // Simula temporalmente la respuesta futura del backend
-    function analizarRostro() {
+    async function analizarRostro() {
         if (!imagenFacial) {
+            setMensaje(
+                "Captura o selecciona una imagen antes de analizar.",
+            );
             return;
         }
 
-        const resultadoSimulado: ResultadoReconocimiento = {
-            persona_id: 12,
-            nombre: "Carlos Pérez",
-            similitud: 0.87,
-            distancia: 0.26,
-            umbral: 0.75,
-            coincide: true,
-            probabilidad_calibrada: 0.93,
-        };
+        try {
+            setAnalizando(true);
+            setMensaje("Analizando rostro...");
+            setResultado(null);
 
-        setResultado(resultadoSimulado);
+            const respuesta =
+                await reconocerRostro(imagenFacial);
+
+            setResultado(respuesta);
+            setMensaje("");
+        } catch (error) {
+            console.error(
+                "Error durante el reconocimiento:",
+                error,
+            );
+
+            setMensaje(
+                "No se pudo completar el reconocimiento facial.",
+            );
+        } finally {
+            setAnalizando(false);
+        }
     }
 
     return (
@@ -57,13 +75,14 @@ function Reconocimiento() {
 
                 <div>
                     <p className="text-sm font-semibold text-ink">
-                        Reconocimiento en modo demostración
+                        Reconocimiento facial activo
                     </p>
 
                     <p className="mt-1 text-xs leading-5 text-muted">
-                        La captura de imagen es real, pero los valores de
-                        identidad, similitud y probabilidad todavía son
-                        simulados hasta conectar FastAPI y el modelo facial.
+                        La imagen será procesada por el backend para
+                        generar un embedding facial, comparar los
+                        rostros registrados y calcular una probabilidad
+                        calibrada.
                     </p>
                 </div>
             </section>
@@ -97,14 +116,22 @@ function Reconocimiento() {
                     {/* Acción de reconocimiento */}
                     <button
                         type="button"
-                        disabled={!imagenFacial}
+                        disabled={!imagenFacial || analizando}
                         onClick={analizarRostro}
                         className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         <ScanFace size={18} />
 
-                        Analizar rostro
+                        {analizando
+                            ? "Analizando..."
+                            : "Analizar rostro"}
                     </button>
+                    {mensaje && (
+                        <p className="mt-4 rounded-lg border border-line bg-surface px-4 py-3 text-xs text-muted">
+                            {mensaje}
+                        </p>
+                    )}
+
 
                     {/* Explicación */}
                     <div className="mt-5 flex gap-3 border-t border-line pt-5">
@@ -114,11 +141,11 @@ function Reconocimiento() {
                         />
 
                         <p className="text-xs leading-5 text-muted">
-                            La imagen deberá convertirse posteriormente en
-                            un <strong className="font-semibold text-ink">
+                            La imagen se convierte en un{" "}
+                            <strong className="font-semibold text-ink">
                                 embedding facial
                             </strong>{" "}
-                            para poder compararse con los rostros registrados.
+                            y se compara con los rostros registrados en el sistema.
                         </p>
                     </div>
                 </article>

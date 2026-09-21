@@ -22,16 +22,16 @@ function FaceResultCard({
             {/* Resultado principal */}
             <div
                 className={`rounded-xl border p-5 ${resultado.coincide
-                        ? "border-brand-100 bg-brand-50"
-                        : "border-red-100 bg-red-50"
+                    ? "border-brand-100 bg-brand-50"
+                    : "border-red-100 bg-red-50"
                     }`}
             >
                 <div className="flex items-start gap-4">
                     {/* Icono del resultado */}
                     <div
                         className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${resultado.coincide
-                                ? "bg-brand-100 text-brand"
-                                : "bg-red-100 text-red-700"
+                            ? "bg-brand-100 text-brand"
+                            : "bg-red-100 text-red-700"
                             }`}
                     >
                         {resultado.coincide ? (
@@ -158,10 +158,11 @@ function FaceResultCard({
                     <strong className="font-semibold text-ink">
                         Interpretación:
                     </strong>{" "}
-                    similitud y probabilidad no representan exactamente
-                    lo mismo. La similitud compara rostros, mientras que
-                    la probabilidad calibrada pretende expresar qué tan
-                    confiable es la decisión del modelo.
+                    similitud y probabilidad no representan lo mismo.
+                    La similitud mide la cercanía entre embeddings,
+                    mientras que la probabilidad calibrada es una
+                    estimación estadística producida por el modelo
+                    de Machine Learning.
                 </p>
             </div>
         </div>

@@ -151,7 +151,7 @@ function CameraCapture({
 
                             <input
                                 type="file"
-                                accept="image/*"
+                                accept="image/jpeg,image/png"
                                 onChange={seleccionarImagen}
                                 className="absolute inset-0 cursor-pointer opacity-0"
                             />

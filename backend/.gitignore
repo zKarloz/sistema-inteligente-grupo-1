@@ -1,0 +1,24 @@
+# Entorno virtual
+.venv/
+venv/
+
+# Variables de entorno
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDE
+.vscode/
+.idea/
+
+# Modelos entrenados
+models/*.pkl
+models/*.joblib
+models/*.onnx
+
+# Este modelo sí se despliega con el backend
+!models/modelo_probabilidad.joblib

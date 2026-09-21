@@ -1,4 +1,5 @@
 import { useState, type SubmitEvent } from "react";
+import { registrarPersona, registrarRostro } from "../services/api";
 import {
     CheckCircle2,
     Mail,
@@ -21,13 +22,14 @@ function RegistroFacial() {
     // Mensaje informativo del formulario
     const [mensaje, setMensaje] = useState("");
 
+    const [registrando, setRegistrando] = useState(false);
+
     // Valida y prepara los datos del registro
-    function registrarPersona(
+    async function manejarRegistro(
         evento: SubmitEvent<HTMLFormElement>,
     ) {
         evento.preventDefault();
 
-        // Validación de nombre y correo
         if (!nombre.trim() || !email.trim()) {
             setMensaje(
                 "Completa el nombre y el correo electrónico.",
@@ -35,7 +37,6 @@ function RegistroFacial() {
             return;
         }
 
-        // Validación de la fotografía facial
         if (!imagenFacial) {
             setMensaje(
                 "Captura o selecciona una imagen antes de continuar.",
@@ -43,21 +44,44 @@ function RegistroFacial() {
             return;
         }
 
-        // Datos que posteriormente se enviarán al backend
-        const datosRegistro = {
-            nombre: nombre.trim(),
-            email: email.trim(),
-            imagen: imagenFacial,
-        };
+        try {
+            setRegistrando(true);
 
-        console.log(
-            "Datos preparados:",
-            datosRegistro,
-        );
+            setMensaje(
+                "Registrando datos personales...",
+            );
 
-        setMensaje(
-            "Datos preparados correctamente. El backend todavía no está conectado.",
-        );
+            // Primero creamos la persona.
+            const persona = await registrarPersona({
+                nombre: nombre.trim(),
+                email: email.trim(),
+            });
+
+            setMensaje(
+                "Persona registrada. Procesando rostro...",
+            );
+
+            // Luego asociamos el rostro a su ID.
+            await registrarRostro(
+                persona.id,
+                imagenFacial,
+            );
+
+            setMensaje(
+                `Registro completado correctamente para ${persona.nombre}.`,
+            );
+        } catch (error) {
+            console.error(
+                "Error durante el registro:",
+                error,
+            );
+
+            setMensaje(
+                "No se pudo completar el registro.",
+            );
+        } finally {
+            setRegistrando(false);
+        }
     }
 
     return (
@@ -85,7 +109,7 @@ function RegistroFacial() {
                     </div>
 
                     {/* Formulario de registro */}
-                    <form onSubmit={registrarPersona}>
+                    <form onSubmit={manejarRegistro}>
                         {/* Nombre */}
                         <label className="block">
                             <span className="text-sm font-medium text-ink">
@@ -145,10 +169,12 @@ function RegistroFacial() {
                                 <strong className="font-semibold text-ink">
                                     Información biométrica
                                 </strong>
+
                                 <br />
-                                En esta etapa la imagen se mantiene únicamente
-                                en el frontend. Todavía no se almacena en una
-                                base de datos.
+
+                                La fotografía se procesa en el backend para
+                                generar una representación facial. La imagen
+                                original no se almacena en esta etapa.
                             </p>
                         </div>
 
@@ -193,11 +219,14 @@ function RegistroFacial() {
                         {/* Botón principal */}
                         <button
                             type="submit"
-                            className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
+                            disabled={registrando}
+                            className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-brand px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
                         >
                             <UserPlus size={18} />
 
-                            Preparar registro
+                            {registrando
+                                ? "Registrando..."
+                                : "Registrar persona"}
                         </button>
                     </form>
                 </article>

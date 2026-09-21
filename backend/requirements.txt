@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+python-multipart
+opencv-python==4.14.0.94
+numpy
+scipy
+scikit-learn
+sqlalchemy
+psycopg2-binary
+insightface==2.0
+onnxruntime
