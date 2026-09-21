@@ -148,7 +148,7 @@ Backend:
 ```bash
 cd backend
 python -m venv .venv
-.venv\Scripts\activate
+source .venv/Scripts/activate
 python -m pip install -r requirements.txt
 uvicorn app.main:app --reload --env-file .env
 ```

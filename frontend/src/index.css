@@ -62,6 +62,33 @@ html {
   scrollbar-gutter: stable;
 }
 
+/* Scrollbar moderna y sencilla */
+
+/* Firefox */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #9bd1bd transparent;
+}
+
+/* Chrome, Edge, Brave y Safari */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #9bd1bd;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #67b59c;
+}
+
 /* Estilo global del sitio */
 body {
   min-width: 320px;
