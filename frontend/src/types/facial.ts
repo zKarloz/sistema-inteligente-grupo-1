@@ -70,7 +70,6 @@ export interface SolicitudReconocimiento {
 // Datos para calcular una probabilidad
 export interface SolicitudProbabilidad {
     similitud: number;
-    distancia: number;
     calidad_imagen: number;
     iluminacion: number;
 }

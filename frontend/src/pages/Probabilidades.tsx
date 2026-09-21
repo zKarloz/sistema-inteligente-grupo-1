@@ -67,6 +67,11 @@ function Probabilidades() {
 
     const coincide = ultimoAnalisis?.coincide ?? false;
 
+    const nombreReconocido =
+        coincide && ultimoAnalisis?.nombre
+            ? ultimoAnalisis.nombre
+            : "Desconocido";
+
     // Métricas que se mostrarán en las tarjetas
     const metricas = [
         {
@@ -162,6 +167,39 @@ function Probabilidades() {
                 !error &&
                 ultimoAnalisis && (
                     <>
+                        {/* Persona del último reconocimiento */}
+                        <section
+                            className={`mb-4 flex items-center gap-4 rounded-xl border p-4 sm:p-5 ${coincide
+                                ? "border-brand-100 bg-brand-50"
+                                : "border-red-100 bg-red-50"
+                                }`}
+                        >
+                            <div
+                                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${coincide
+                                    ? "bg-brand-100 text-brand"
+                                    : "bg-red-100 text-red-700"
+                                    }`}
+                            >
+                                <ScanFace size={21} />
+                            </div>
+
+                            <div>
+                                <p className="text-xs font-semibold uppercase tracking-wider text-muted">
+                                    Último reconocimiento
+                                </p>
+
+                                <h2 className="mt-1 font-display text-lg font-semibold text-ink">
+                                    {nombreReconocido}
+                                </h2>
+
+                                <p className="mt-1 text-xs text-muted">
+                                    {coincide
+                                        ? "Persona reconocida por el sistema."
+                                        : "Sin coincidencia con una persona registrada."}
+                                </p>
+                            </div>
+                        </section>
+
                         {/* Tarjetas principales */}
                         <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                             {metricas.map((metrica) => {
