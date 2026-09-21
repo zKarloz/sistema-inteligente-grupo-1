@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, ArrowUpRight, CheckCircle2, ScanFace, ShieldCheck, ShieldX, Users } from "lucide-react";
+import { ArrowRight, ArrowUpRight, CheckCircle2, ScanFace, ShieldCheck, ShieldX, Smartphone, Users } from "lucide-react";
 
 import LoadingState from "../components/LoadingState";
 import ProbabilityChart from "../components/ProbabilityChart";
@@ -112,6 +112,64 @@ function Dashboard() {
 
     return (
         <div className="mx-auto w-full max-w-[1500px]">
+
+            {/* Aviso responsive */}
+            <section className="mb-5 flex flex-col gap-4 rounded-xl border border-brand-100 bg-brand-50 p-5 sm:flex-row sm:items-center sm:justify-between">
+                {/* Lado izquierdo */}
+                <div className="flex min-w-0 items-start gap-4">
+                    {/* Icono */}
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-brand">
+                        <Smartphone
+                            size={22}
+                            className="animate-pulse"
+                        />
+                    </div>
+
+                    <div className="min-w-0">
+                        {/* Texto para PC */}
+                        <div className="hidden sm:block">
+                            <span className="text-xs font-semibold tracking-wider text-brand">
+                                NOVEDAD
+                            </span>
+
+                            <h2 className="mt-2 font-display text-lg font-semibold text-ink">
+                                Nuestra página está adaptada a dispositivos móviles
+                            </h2>
+
+                            <p className="mt-1 text-sm leading-6 text-muted">
+                                Prueba la experiencia responsive desde tu teléfono
+                                o utiliza las herramientas de dispositivo del navegador.
+                            </p>
+                        </div>
+
+                        {/* Texto para móvil */}
+                        <div className="sm:hidden">
+                            <span className="text-xs font-semibold tracking-wider text-brand">
+                                NOVEDAD
+                            </span>
+
+                            <h2 className="mt-2 font-display text-base font-semibold text-ink">
+                                Experiencia responsive
+                            </h2>
+
+                            <p className="mt-1 text-sm leading-6 text-muted">
+                                Estás viendo la versión adaptada para dispositivos móviles.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Solo PC */}
+                <div className="f12-hint shrink-0 rounded-lg border border-brand-200 bg-white px-5 py-3 text-center">
+                    <p className="text-xs font-semibold text-brand">
+                        Pruébalo ahora
+                    </p>
+
+                    <p className="mt-1 text-[11px] text-muted">
+                        F12 → vista móvil
+                    </p>
+                </div>
+            </section>
 
             {/* Hero principal */}
             <section className="relative overflow-hidden rounded-2xl bg-brand-950 px-6 py-8 text-white sm:px-8 lg:flex lg:min-h-64 lg:items-center lg:justify-between">

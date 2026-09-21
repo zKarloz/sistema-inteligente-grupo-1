@@ -88,3 +88,14 @@ button {
   outline: 3px solid #43bba2;
   outline-offset: 3px;
 }
+
+/* Evita que muestre la mini tarjeta "Pruébalo ahora F12 → vista móvil" en dispositivos que normalmente no se utilizaría un puntero */
+.f12-hint {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .f12-hint {
+    display: block;
+  }
+}
