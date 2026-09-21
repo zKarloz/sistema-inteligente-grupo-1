@@ -15,10 +15,11 @@ def get_face_app():
     if _face_app is None:
         _face_app = FaceAnalysis(
             name=MODEL_NAME,
-            providers=["CPUExecutionProvider"]
+            providers=["CPUExecutionProvider"],
+            allowed_modules=["detection", "recognition"],
         )
 
-        _face_app.prepare()
+        _face_app.prepare(ctx_id=0, det_size=(320, 320),)
 
     return _face_app
 
