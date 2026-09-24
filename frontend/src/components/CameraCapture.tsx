@@ -61,7 +61,7 @@ function CameraCapture({
     return (
         <div>
             {/* Área principal de cámara o fotografía */}
-            <div className="relative flex min-h-[320px] items-center justify-center overflow-hidden rounded-xl bg-brand-950">
+            <div className="relative flex h-[320px] items-center justify-center overflow-hidden rounded-xl bg-brand-950">
                 {!imagenCapturada ? (
                     <>
                         {/* Cámara */}
@@ -102,7 +102,7 @@ function CameraCapture({
                         <img
                             src={imagenCapturada}
                             alt="Rostro preparado para el registro"
-                            className="h-full min-h-[320px] w-full object-contain"
+                            className="h-full w-full object-contain bg-grey"
                         />
 
                         {/* Confirmación */}
